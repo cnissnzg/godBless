@@ -2,6 +2,7 @@
 import torch
 import torchvision
 import torchvision.transforms as transforms
+BATCH_SIZE = 32
 
 
 def loadTraindata():
@@ -13,7 +14,6 @@ def loadTraindata():
 
 
 trainData = loadTraindata()
-print(trainData)
 
 for step, (data, y) in enumerate(trainData):
     print(step, data.size())

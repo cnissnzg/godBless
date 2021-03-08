@@ -8,14 +8,15 @@ import torch.utils.data as Data
 import cv2
 import random
 import numpy as np
+from data import BATCH_SIZE,trainData
 import watermark
 import imageProcess
 
-EPOCH = 3
-BATCH_SIZE = 50
+EPOCH = 10
 LR = 0.001
 DOWNLOAD_MINIST = False
 lamd = 0.5
+DEBUG = False
 
 
 class WatermarkGeneration(nn.Module):
@@ -238,10 +239,10 @@ class templateExtNet(nn.Module):
         x = self.layer6(x)
         x = self.layer7(x)
         x = self.layer8(x)
-        x = x.view(1, -1)
+        x = x.view(x.size(0),1, -1)
 
         x = self.FC(x)
-        x = x.view(64, 64)
+        x = x.view(x.size(0),64, 64)
         return x
 
 
@@ -385,8 +386,8 @@ class EularLoss(nn.Module):
     def forward(self, Ge, Gt):
         Ge = torch.split(Ge, 1,dim=2)
         Gt = torch.tensor(Gt).split(1)
-        print(Ge)
-        print(Gt)
+        #print(Ge)
+        #print(Gt)
         res = None
         for y in self.Y:
             for x in self.X:
@@ -469,26 +470,31 @@ def preTrain(key):
 
 
 def process(img, key, temp, RST, M=512, N=512, m=8, n=8):
-    for i in range(m):
-        for j in range(n):
-            if key[i][j] == 1:
-                # img[i*8:i*8+8,j*8:j*8+8] = watermark.watermark_embedding(img[i*8:i*8+8,j*8:j*8+8])
-                continue
-            else:
-                for ii in range(m):
-                    for jj in range(n):
-                        img[i * 8 + ii, j * 8 + jj] = np.clip(
-                            img[i * 8 + ii, j * 8 + jj] + temp[i * 8 + ii, j * 8 + jj], 0, 255)
-    return imageProcess.doRST(img,RST, M, N)
+    img = img.detach().numpy()
+    for t in range(len(img)):
+        for i in range(m):
+            for j in range(n):
+                if key[i][j] == 1:
+                    # img[i*8:i*8+8,j*8:j*8+8] = watermark.watermark_embedding(img[i*8:i*8+8,j*8:j*8+8])
+                    continue
+                else:
+                    for ii in range(m):
+                        for jj in range(n):
+                            img[t][0][i * 8 + ii, j * 8 + jj] = np.clip(
+                                img[t][0][i * 8 + ii, j * 8 + jj] + temp[t][0][i * 8 + ii, j * 8 + jj], 0, 255)
+        img[t][0] = imageProcess.doRST(img[t][0],RST, M, N)
+    return img
 
 def debug(t,text=''):
+    if not DEBUG:
+        return
     print(text,t,t.size())
 
 img = cv2.cvtColor(cv2.imread('lena.jpg'), cv2.COLOR_RGB2GRAY)
-RST = [30,0.9,1.1,0.05,0.05]
 key = templateGen(64, 64)
 preTrain(key)
-origin = torch.tensor(np.array([[key]], dtype=np.float32))
+multiKey = [[key] for i in range(BATCH_SIZE)]
+origin = torch.tensor(multiKey, dtype=torch.float32)
 debug(origin)
 
 watermarkGen = WatermarkGeneration(key)
@@ -500,43 +506,52 @@ optimizerLe = torch.optim.Adam(tExtN.parameters(), lr=1e-3)
 optimizerLd = torch.optim.Adam(fExtN.parameters(), lr=1e-3)
 optimizerL = torch.optim.Adam(tMatN.parameters(), lr=1e-3)
 
-for epoch in range(100000):
-    print('time',epoch,':')
-    temp = origin
-    tempNoise = watermarkGen(Variable(temp))
-    loss_func = L2Loss()
-    Lg = loss_func(tempNoise)
-    optimizerLg.zero_grad()
-    debug(tempNoise)
+for epoch in range(EPOCH):
+    for step, (data, y) in enumerate(trainData):
+        print('epoch',epoch,', step',step,':')
+        RST = [random.randint(0,90), random.uniform(0.7,1.5), random.uniform(0.7,1.5), random.uniform(0,0.3),random.uniform(0,0.3)]
+        temp = origin
+        tempNoise = watermarkGen(Variable(temp))
+        loss_func = L2Loss()
+        Lg = loss_func(tempNoise)
+        optimizerLg.zero_grad()
+        debug(tempNoise)
 
-    imgProcessed = process(img, key, tempNoise.detach().numpy()[0][0], RST)
-    extTemp = tExtN(Variable(torch.tensor(np.array([[imgProcessed]], dtype=np.float32))))
-    debug(extTemp)
-    GTemplate = imageProcess.doRST(key, RST, 64, 64)
-    print(GTemplate)
-    loss_func = L2Loss(64, torch.tensor(GTemplate))
-    Le = loss_func(extTemp)
-    optimizerLe.zero_grad()
+        imgProcessed = process(data, key, tempNoise.detach().numpy(), RST)
+        extTemp = tExtN(Variable(torch.tensor(imgProcessed,dtype=torch.float32)))
+        debug(extTemp)
+        GTemplate = imageProcess.doRST(key, RST, 64, 64)
+        if DEBUG:
+            print(GTemplate)
+        loss_func = L2Loss(64, torch.tensor(GTemplate))
+        Le = loss_func(extTemp)
+        Lt = torch.add(torch.mul(lamd, Lg), torch.mul(1 - lamd, Le)).mean()
+        optimizerLe.zero_grad()
 
-    extTemp = extTemp.view(-1, 1, 64, 64)
-    extTemp = torch.cat((extTemp, extTemp), 0)#TODO delete
-    temp = torch.cat((temp, temp), 0)#TODO delete
-    featureExtTemp = fExtN(extTemp)
-    temp = fExtN(temp)
-    featureExtTemp = torch.cat((featureExtTemp, temp), 1)
-    optimizerLd.zero_grad()
-    debug(featureExtTemp)
+        extTemp = extTemp.view(-1, 1, 64, 64)
+        #extTemp = torch.cat((extTemp, extTemp), 0)#TODO delete
+        #temp = torch.cat((temp, temp), 0)#TODO delete
+        featureExtTemp = fExtN(extTemp)
+        temp = fExtN(temp)
+        featureExtTemp = torch.cat((featureExtTemp, temp), 1)
+        optimizerLd.zero_grad()
+        debug(featureExtTemp)
 
-    out = tMatN(featureExtTemp)
-    debug(out)
-    loss_func = EularLoss()
-    Ld = loss_func(out,RST)
-    L = torch.add(torch.mul(lamd,Lg),torch.mul(1-lamd,Ld)).mean()
-    debug(L)
-    optimizerL.zero_grad()
-    L.backward()
+        out = tMatN(featureExtTemp)
+        debug(out)
+        loss_func = EularLoss()
+        Ld = loss_func(out,RST)
+        L = torch.add(torch.mul(lamd,Lt),torch.mul(1-lamd,Ld)).mean()
+        print('loss:',L.item())
+        optimizerL.zero_grad()
+        L.backward()
 
-    optimizerL.step()
-    optimizerLd.step()
-    optimizerLe.step()
-    optimizerLg.step()
+        optimizerL.step()
+        optimizerLd.step()
+        optimizerLe.step()
+        optimizerLg.step()
+
+torch.save(watermarkGen,'watermarkGen.pkl')
+torch.save(tExtN,'tExtN.pkl')
+torch.save(fExtN,'fExtN.pkl')
+torch.save(tMatN,'tMatN.pkl')
