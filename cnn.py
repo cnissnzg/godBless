@@ -18,7 +18,7 @@ DOWNLOAD_MINIST = False
 lamd = 0.5
 DEBUG = False
 
-
+#hi
 class WatermarkGeneration(nn.Module):
     def __init__(self, key):
         super(WatermarkGeneration, self).__init__()
