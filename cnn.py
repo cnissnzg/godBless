@@ -512,7 +512,7 @@ for epoch in range(EPOCH):
         RST = [random.randint(0,90), random.uniform(0.7,1.5), random.uniform(0.7,1.5), random.uniform(0,0.3),random.uniform(0,0.3)]
         temp = origin
         if(data.size(0) < BATCH_SIZE):
-            temp = temp.split(data.size(0))
+            break
         tempNoise = watermarkGen(Variable(temp))
         loss_func = L2Loss()
         Lg = loss_func(tempNoise)
