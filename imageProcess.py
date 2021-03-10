@@ -136,7 +136,7 @@ class attack:
 
     def translation(self,h,w):
         temp = np.zeros((int(self.h + h),int(self.w + w)),np.uint8)
-        print(self.image.shape,h,w)
+        #print(self.image.shape,h,w)
         temp[int(max(0,h)):int(max(0,h))+int(self.image.shape[0]),int(max(0,w)):int(max(0,w))+int(self.image.shape[1])] = self.image
 
         self.image = temp
