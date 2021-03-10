@@ -14,7 +14,8 @@ def loadTraindata():
 
 
 trainData = loadTraindata()
-
+'''
 for step, (data, y) in enumerate(trainData):
     print(step, data.size())
     break
+'''

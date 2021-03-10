@@ -135,10 +135,16 @@ class attack:
         return self
 
     def translation(self,h,w):
-        mat_trans = np.float32([[1, 0, h], [0, 1, w]])
-        self.image = cv2.warpAffine(self.image, mat_trans, (int(self.w + w), int(self.h + h)))
-        self.w += w
-        self.h += h
+        temp = np.zeros((int(self.h + h),int(self.w + w)),np.uint8)
+        print(self.image.shape,h,w)
+        temp[int(max(0,h)):int(max(0,h))+int(self.image.shape[0]),int(max(0,w)):int(max(0,w))+int(self.image.shape[1])] = self.image
+
+        self.image = temp
+        self.h = self.image.shape[0]
+        self.w = self.image.shape[1]
+        #mat_trans = np.float32([[1, 0, h], [0, 1, w]])
+        #self.image = cv2.warpAffine(self.image, mat_trans, (self.w, self.h))
+
         return self
 
     def pro_tran(self):
@@ -236,7 +242,6 @@ def doRST(img,param,M=512,N=512):
     new = new.rotate(param[0])
     new = new.resize(abs(param[2]),abs(param[1]))
     new = new.translation(M*param[3],N*param[4])
-
     return cv2.resize(new.image,(M,N))
 
 new = attack('lena.jpg')

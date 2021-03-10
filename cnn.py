@@ -490,6 +490,12 @@ def debug(t,text=''):
         return
     print(text,t,t.size())
 
+def getRST():
+    RST = [random.randint(0, 90), random.uniform(0.7, 1.5), random.uniform(0.7, 1.5), random.uniform(0, 0.3),
+           random.uniform(0, 0.3)]
+    print(RST)
+    return RST
+
 img = cv2.cvtColor(cv2.imread('lena.jpg'), cv2.COLOR_RGB2GRAY)
 key = templateGen(64, 64)
 preTrain(key)
