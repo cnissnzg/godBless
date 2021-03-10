@@ -395,6 +395,8 @@ class EularLoss(nn.Module):
         for y in self.Y:
             for x in self.X:
                 Pe = self.doRST(Ge, y, x)
+
+
                 Pt = self.doRST(Gt, y, x)
                 Pe = Pe[0].sub(Pt[0]).pow(2).add(Pe[1].sub(Pt[1]).pow(2)).sqrt()
                 if res is None:
@@ -518,11 +520,13 @@ optimizerLe = torch.optim.Adam(tExtN.parameters(), lr=1e-3)
 optimizerLd = torch.optim.Adam(fExtN.parameters(), lr=1e-3)
 optimizerL = torch.optim.Adam(tMatN.parameters(), lr=1e-3)
 
+RSTs = list()
+for i in range(32):
+    RSTs.append(getRST())
 for epoch in range(EPOCH):
 
     for step, (data, y) in enumerate(trainData):
-        RST = [random.randint(0, 90), random.uniform(0.7, 1.5), random.uniform(0.7, 1.5), random.uniform(0, 0.3),
-               random.uniform(0, 0.3)]
+        RST = RSTs[step % 32]
         print('epoch', epoch, ', step', step, ':')
         temp = origin
         if data.size(0) < BATCH_SIZE:
