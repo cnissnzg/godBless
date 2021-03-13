@@ -18,13 +18,15 @@ class attack:
         self.w = self.image.shape[1]
 
 
-    def blur(self):
-        kernel = np.ones((5, 5), np.float32) / 25
+    def blur(self,size,rate):
+        kernel = np.ones((size, size), np.float32) * rate
         self.image = cv2.filter2D(self.image, -1, kernel)
         return self
 
-    def sharpen(self):
-        mat = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]], dtype=np.float32)
+    def sharpen(self,size):
+        mat = np.ones((size,size),dtype=np.float32) * -1.
+        mat[(size+1)/2][(size+1)/2] = size*size
+        #mat = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]], dtype=np.float32)
         self.image = cv2.filter2D(self.image, cv2.CV_32F, mat)
         self.image = cv2.convertScaleAbs(self.image)
         return self
@@ -63,6 +65,16 @@ class attack:
         hls = cv2.cvtColor(fImg, cv2.COLOR_BGR2HLS)
         hls[:, :, 2] = rate * hls[:, :, 2]
         hls[:, :, 2][hls[:, :, 2] > 1] = 1
+        fImg = cv2.cvtColor(hls, cv2.COLOR_HLS2BGR)
+        self.image = fImg * 255.0
+        return self
+
+    def hue(self, rate):
+        fImg = self.image.astype(np.float32)
+        fImg = fImg / 255.0
+        hls = cv2.cvtColor(fImg, cv2.COLOR_BGR2HLS)
+        hls[:, :, 0] = rate * hls[:, :, 0]
+        hls[:, :, 0][hls[:, :, 0] > 360] = 360
         fImg = cv2.cvtColor(hls, cv2.COLOR_HLS2BGR)
         self.image = fImg * 255.0
         return self
