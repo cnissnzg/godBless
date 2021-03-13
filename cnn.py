@@ -16,7 +16,7 @@ EPOCH = 200
 PRE_EPOCH = 200000
 LR = 0.001
 DOWNLOAD_MINIST = False
-lamd = 0.5
+lamd = 0.3
 DEBUG = False
 
 
@@ -221,6 +221,7 @@ class templateExtNet(nn.Module):
             ),
             nn.BatchNorm2d(1),
             nn.ReLU()
+
         )
         self.FC = nn.Linear(53 * 53, 64 * 64)
         nn.init.xavier_uniform_(next(self.layer1.children()).weight)
@@ -507,6 +508,7 @@ def getRST():
 
 img = cv2.cvtColor(cv2.imread('lena.jpg'), cv2.COLOR_RGB2GRAY)
 key = templateGen(64, 64)
+np.set_printoptions(threshold=np.inf)
 multiKey = [[key] for i in range(BATCH_SIZE)]
 origin = torch.tensor(multiKey, dtype=torch.float32).cuda()
 debug(origin)
