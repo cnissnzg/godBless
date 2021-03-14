@@ -13,7 +13,7 @@ import watermark
 import imageProcess
 
 EPOCH = 300
-PRE_EPOCH = 200000
+PRE_EPOCH = 20000
 LR = 0.001
 DOWNLOAD_MINIST = False
 lamd = 0.3
@@ -528,7 +528,7 @@ for epoch in range(EPOCH):
     origin = torch.tensor(multiKey, dtype=torch.float32).cuda()
     debug(origin)
     for step, (data, y) in enumerate(trainData):
-        RST = RSTs[step % 32]
+        RST = RSTs[(epoch+step) % 32]
         print('epoch', epoch, ', step', step, ':')
         temp = origin
         if data.size(0) < BATCH_SIZE:
