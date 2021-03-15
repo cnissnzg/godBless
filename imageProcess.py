@@ -6,6 +6,61 @@ import numpy as np
 import random
 import math
 import libjpeg
+from numba import jit
+
+@jit(nopython=True)
+def gaussian_out(h,w,img):
+    for j in range(0, h):
+        n = random.uniform(-0.1, 0.1)
+        for k in range(0, w):
+            for i in range(0, 3):
+                img[j, k, i] += n
+    return img
+
+@jit(nopython=True)
+def cfa_out_I(h,w,new_img,image,jud):
+    for i in range(1, h + 1, 2):
+        for j in range(1, w + 1, 2):
+            new_img[i, j, 0] = image[i - 1, j - 1, 0]
+            new_img[i + 1, j + 1, 2] = image[i, j, 2]
+            new_img[i + 1, j, 1] = image[i, j - 1, 1]
+            new_img[i, j + 1, 1] = image[i - 1, j, 1]
+            jud[i, j, 0] = 1
+            jud[i + 1, j + 1, 2] = 1
+            jud[i, j + 1, 1] = 1
+            jud[i + 1, j, 1] = 1
+    return new_img,jud
+
+@jit(nopython=True)
+def cfa_out_II(h,w,new_img,jud,cz_img,dy,dx):
+    for i in range(1, h + 1):
+        for j in range(1, w + 1):
+            for k in range(0, 3):
+                if jud[i, j, k] == 1:
+                    cz_img[i, j, k] = new_img[i, j, k]
+                    continue
+                fz, fm = 0, 0
+                for dxy in range(0, 8):
+                    fz += new_img[i + dx[dxy], j + dy[dxy], k]
+                    fm += jud[i + dx[dxy], j + dy[dxy], k]
+                cz_img[i, j, k] = np.uint8(fz / fm)
+    return cz_img
+
+@jit(nopython=True)
+def noise_out(image,h,w):
+    def clip(v,l,r):
+        if v < l:
+            v=l
+        elif v > r:
+            v=r
+        return v
+    for i in range(0, h):
+        for j in range(0, w):
+            s = np.random.normal(0, 5, 3)
+            image[i, j, 0] = clip(image[i, j, 0] + s[0], 0, 255)
+            image[i, j, 1] = clip(image[i, j, 1] + s[1], 0, 255)
+            image[i, j, 2] = clip(image[i, j, 2] + s[2], 0, 255)
+    return image
 
 class attack:
 
@@ -31,12 +86,28 @@ class attack:
         self.image = cv2.convertScaleAbs(self.image)
         return self
 
-    def chop(self, rate):
-        self.image[self.w - int(self.w * rate):, :] = self.image[:int(self.w * rate), :]
+    def chop(self, rate,code):
+        if code == 'vertical':
+            self.image[:, self.w - int(self.w * rate):] = self.image[:, :int(self.w * rate)]
+        else:
+            self.image[self.h - int(self.h * rate):, :] = self.image[:int(self.h * rate), :]
+        return self
+
+    def cut(self,left,right,up,bottom):
+        self.image = self.image[self.w*left:self.w*(1-right),self.h*up,:self.h*(1-bottom)]
+        self.h = self.image.shape[0]
+        self.w = self.image.shape[1]
+        return self
+
+    def cover(self,height,width):
+        x = random.randint(0,self.w-width)
+        y = random.randint(0,self.h-height)
+        cv2.rectangle(self.image, (x, y), (x+width,y+height),
+                      (0, 0, 0), -1)
         return self
 
     def rotate(self, angle):
-        rangle = np.deg2rad(angle)  # angle in radians
+        rangle = np.deg2rad(angle)
         nw = abs(np.sin(rangle) * self.h) + abs(np.cos(rangle) * self.w)
         nh = abs(np.cos(rangle) * self.h) + abs(np.sin(rangle) * self.w)
         rot_mat = cv2.getRotationMatrix2D((nw * 0.5, nh * 0.5), angle, 1.)
@@ -101,20 +172,16 @@ class attack:
                 self.image[j, i, 2] = 255
         return self
 
-    def cover(self):
-        cv2.rectangle(self.image, (int(self.w / 4), int(self.h / 4)), (int(self.w / 2), int(self.h / 2)),
-                      (255, 255, 255), -1)
-        return self
 
     def flip(self, code):
-        if code == 1:
+        if code == 'vertical':
             self.image = np.fliplr(self.image)
         else:
             self.image = np.flipud(self.image)
         return self
 
     def liner_blur(self):
-        liner_blur_degree = int(random.uniform(3., 8.))
+        liner_blur_degree = 3
         tran = cv2.getRotationMatrix2D((liner_blur_degree / 2, liner_blur_degree / 2), random.uniform(0, 180.), 1)
         liner_blur_kernel = np.diag(np.ones(liner_blur_degree))
         liner_blur_kernel = cv2.warpAffine(liner_blur_kernel, tran, (liner_blur_degree, liner_blur_degree))
@@ -125,25 +192,15 @@ class attack:
         return self
 
     def gaussian_blur(self):
-        gaussian_blur_size = random.choice([1, 3])
+        gaussian_blur_size = 3
         self.image = cv2.GaussianBlur(self.image, ksize=(gaussian_blur_size, gaussian_blur_size), sigmaX=0, sigmaY=0)
-        for i in range(0, 3):
-            n = random.uniform(-0.1, 0.1)
-            for j in range(0, self.h):
-                for k in range(0, self.w):
-                    self.image[j, k, i] += n
+        self.image = gaussian_out(self.h,self.w,self.image)
         return self
 
     def gaussian_noise(self):
         self.h = self.image.shape[0]
         self.w = self.image.shape[1]
-
-        for i in range(0, self.h):
-            for j in range(0, self.w):
-                s = np.random.normal(0, 5, 3)
-                self.image[i, j, 0] = np.clip(self.image[i, j, 0] + s[0], 0, 255)
-                self.image[i, j, 1] = np.clip(self.image[i, j, 1] + s[1], 0, 255)
-                self.image[i, j, 2] = np.clip(self.image[i, j, 2] + s[2], 0, 255)
+        self.image = noise_out(self.image,self.h,self.w)
         return self
 
     def translation(self,h,w):
@@ -166,6 +223,7 @@ class attack:
         p2 = [random.uniform(w * 0.95, w), random.uniform(0, h * 0.05)]
         p3 = [random.uniform(0, w * 0.05), random.uniform(h * 0.95, h)]
         p4 = [random.uniform(w * 0.95, w), random.uniform(h * 0.95, h)]
+        print("pro_tran:",p1,p2,p3,p4)
         l = math.ceil(min(p1[0], p3[0]))
         r = math.floor(max(p2[0], p4[0]))
         u = math.ceil(min(p1[1], p2[1]))
@@ -179,51 +237,18 @@ class attack:
 
         return self
 
-    def shepin(self):
-        self.pro_tran()
-        self.liner_blur()
-        self.gaussian_blur()
 
-        self.image = cv2.convertScaleAbs(self.image, alpha=random.uniform(0.5, 1.5), beta=random.uniform(-0.3, 0.3))
-
-        self.image = self.image / 255
-        noise = np.random.normal(0, random.uniform(0, 0.1), self.image.shape)
-        self.image = self.image + noise
-        self.image = np.clip(self.image, 0, 1)
-        self.image = np.uint8(self.image * 255)
-        return self
-
-    def cfa(self):
+    def cameraScreen(self):
         w = self.w - (self.w & 1)
         h = self.h - (self.h & 1)
         new_img = np.zeros([h + 3, w + 3, 3], dtype=np.uint8)
         jud = np.zeros([h + 3, w + 3, 3], dtype=np.uint8)
-        for i in range(1, h + 1, 2):
-            for j in range(1, w + 1, 2):
-                new_img[i, j, 0] = self.image[i - 1, j - 1, 0]
-                new_img[i + 1, j + 1, 2] = self.image[i, j, 2]
-                new_img[i + 1, j, 1] = self.image[i, j - 1, 1]
-                new_img[i, j + 1, 1] = self.image[i - 1, j, 1]
-                jud[i, j, 0] = 1
-                jud[i + 1, j + 1, 2] = 1
-                jud[i, j + 1, 1] = 1
-                jud[i + 1, j, 1] = 1
+        new_img,jud = cfa_out_I(h,w,new_img,self.image,jud)
         dx = [-1, 0, 1, 1, 1, 0, -1, -1]
         dy = [-1, -1, -1, 0, 1, 1, 1, 0]
 
         cz_img = np.zeros([h + 3, w + 3, 3], dtype=np.uint8)
-        for i in range(1, h + 1):
-            for j in range(1, w + 1):
-                for k in range(0, 3):
-                    if jud[i, j, k] == 1:
-                        cz_img[i, j, k] = new_img[i, j, k]
-                        continue
-                    fz, fm = 0, 0
-                    for dxy in range(0, 8):
-                        fz += new_img[i + dx[dxy], j + dy[dxy], k]
-                        fm += jud[i + dx[dxy], j + dy[dxy], k]
-                    cz_img[i, j, k] = np.uint8(fz / fm)
-                    # print(i,j,k,fz,fm)
+        cz_img = cfa_out_II(h,w,new_img,jud,cz_img,np.array(dy),np.array(dx))
 
         self.image = cz_img[1:h + 1, 1:w + 1]
         self.h = h
@@ -242,6 +267,8 @@ class attack:
         self.pro_tran()
         self.liner_blur()
         self.gaussian_blur()
+        alpha,beta = random.uniform(0.8, 1.2),random.uniform(-3, 3)
+        self.image = cv2.convertScaleAbs(self.image, alpha=alpha, beta=beta)
         self.cfa()
         self.gaussian_noise()
         self.image = cv2.fastNlMeansDenoisingColored(self.image)
@@ -255,112 +282,10 @@ def doRST(img,param,M=512,N=512):
     new = new.resize(abs(param[2]),abs(param[1]))
     new = new.translation(M*param[3],N*param[4])
     return cv2.resize(new.image,(M,N))
-
-new = attack('lena.jpg')
-'''
-# new.morie()
-# cv2.imwrite('rotateTest.jpg', new.image)
-img = new.image
-t = cv2.cvtColor(new.image, cv2.COLOR_RGB2YUV)
-print(t)
-x = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-x = x / 2.5
-print(x)
-print(x.shape)
-'''
-
-
-def watermark_embedding(x, q=3., b=1,s=2):
-    C_m = x.copy()
-    L = len(x[s]) // 2
-    for l in range(L):
-        C = x[s][l]
-        C_op = x[s][l+L]
-        m, n = C.shape[0], C.shape[1]
-        A_sl = 0.
-        for C_i in C:
-            for C_ij in C_i:
-                A_sl += abs(C_ij)
-        A_sl /= m * n
-
-        if round(A_sl / q) % 2 == b:
-            Q_A = A_sl / abs(A_sl) * (round(abs(A_sl) / q) * q)
-        else:
-            if math.fmod(abs(A_sl) / q, 1.) <= 0.5:
-                Q_A = A_sl / abs(A_sl) * (round(abs(A_sl) / q + 0.5) * q)
-            else:
-                Q_A = A_sl / abs(A_sl) * (round(abs(A_sl) / q - 0.5) * q)
-
-        for i in range(m):
-            for j in range(n):
-                C_m[s][l][i][j] = C[i][j] * Q_A / A_sl
-                C_m[s][l+L][i][j] = C_op[i][j] * Q_A / A_sl
-                #x[s][l][i][j] = x[s][l][i][j] * (4.)
-
-    return C_m
-
-def watermark_decoding(C_m,q=3,s=2):
-    b = list()
-    L = len(C_m[s]) // 2
-    for l in range(L):
-        C = C_m[s][l]
-        m, n = C.shape[0], C.shape[1]
-        A_sl = 0.
-        for C_i in C:
-            for C_ij in C_i:
-                A_sl += abs(C_ij)
-        A_sl /= m * n
-        b.append(round(A_sl/q) % 2)
-    return b
-
-def divide_image(M,N):
-    key = [0]*(M*N//2) + [1]*(M*N//2)
-    random.shuffle(key)
-    key = np.array(key).reshape((M,N))
-    return key
-
-def zigZag(M,m,n):
-    x,y,k = 0,0,0
-    res = [M[0][0]]
-    while True:
-        if y == 0 and (x+m*2+n*2) % 2 == 0:
-            x += 1
-        elif y == m-1 and (x+m*2+n*2) % 2 == m%2:
-            x += 1
-        elif (x+y) % 2 == 1:
-            x -= 1
-            y += 1
-        else:
-            x += 1
-            y -= 1
-        if y < m and x < n and y >= 0 and x >= 0:
-            res.append(M[y][x])
-        if y == m-1 and x > n-1:
-            break
-    return res
-
-def noise_fill(M,N,seq,key,m=8,n=8):
-    res = np.ndarray((M,N),dtype=np.float32)
-    print(key)
-    k = 0
-    for i in range(M):
-        for j in range(N):
-            if key[i//m][j//n] == 0:
-                print(i,j,k)
-                res[i][j] = seq[k]
-                k+=1
-            else:
-                res[i][j] = 0
-    return res
-
-if __name__ == '__main_':
-    key = divide_image(4,4)
-    cof = cv2.cvtColor(new.image, cv2.COLOR_RGB2GRAY)
-    cof = cv2.dct(cof.astype(np.float32))[:16,:16]
-    m,n = 16,16
-    cof = zigZag(cof,m,n)[m*n//4:m*n//4*3]
-    res = noise_fill(m,n,cof,key,4,4)
-    print(res)
+if __name__ == '__main__':
+    new = attack('lena.jpg')
+    new.cameraScreen()
+    cv2.imwrite('dolena.jpg',new.image)
 '''
 print(divide_image(4,4))
 cof = cv2.cvtColor(new.image, cv2.COLOR_RGB2GRAY)
@@ -369,4 +294,16 @@ m,n = cof.shape
 print(m,n)
 cof = zigZag(cof,m,n)[m*n//4:m*n//4*3]
 print(len(cof),m*n)
+
+    def cameraScreen(self):
+        self.pro_tran()
+        self.liner_blur()
+        self.gaussian_blur()
+
+        self.image = self.image / 255
+        noise = np.random.normal(0, random.uniform(0, 0.1), self.image.shape)
+        self.image = self.image + noise
+        self.image = np.clip(self.image, 0, 1)
+        self.image = np.uint8(self.image * 255)
+        return self
 '''
