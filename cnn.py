@@ -12,11 +12,11 @@ from data import BATCH_SIZE, trainData
 import watermark
 import imageProcess
 
-EPOCH = 200
-PRE_EPOCH = 200000
+EPOCH = 300
+PRE_EPOCH = 20000
 LR = 0.001
 DOWNLOAD_MINIST = False
-lamd = 0.5
+lamd = 0.3
 DEBUG = False
 
 
@@ -221,6 +221,7 @@ class templateExtNet(nn.Module):
             ),
             nn.BatchNorm2d(1),
             nn.ReLU()
+
         )
         self.FC = nn.Linear(53 * 53, 64 * 64)
         nn.init.xavier_uniform_(next(self.layer1.children()).weight)
@@ -505,12 +506,9 @@ def getRST():
     print(RST)
     return RST
 
+
 img = cv2.cvtColor(cv2.imread('lena.jpg'), cv2.COLOR_RGB2GRAY)
 key = templateGen(64, 64)
-multiKey = [[key] for i in range(BATCH_SIZE)]
-origin = torch.tensor(multiKey, dtype=torch.float32).cuda()
-debug(origin)
-
 watermarkGen = preTrain(key)
 tExtN = templateExtNet().cuda()
 fExtN = featureExtNet().cuda()
@@ -524,9 +522,13 @@ RSTs = list()
 for i in range(32):
     RSTs.append(getRST())
 for epoch in range(EPOCH):
-
+    img = cv2.cvtColor(cv2.imread('lena.jpg'), cv2.COLOR_RGB2GRAY)
+    key = templateGen(64, 64)
+    multiKey = [[key] for i in range(BATCH_SIZE)]
+    origin = torch.tensor(multiKey, dtype=torch.float32).cuda()
+    debug(origin)
     for step, (data, y) in enumerate(trainData):
-        RST = RSTs[step % 32]
+        RST = RSTs[(epoch+step) % 32]
         print('epoch', epoch, ', step', step, ':')
         temp = origin
         if data.size(0) < BATCH_SIZE:
