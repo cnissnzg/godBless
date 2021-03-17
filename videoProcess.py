@@ -1,6 +1,7 @@
 import cv2
 import os
 import numpy as np
+import random
 
 fmt = ['mp4','mp5','avi','yuv','rm','rmvb']
 
@@ -56,9 +57,56 @@ class VideoAttack:
         prefix = 'sharpen' + str(size) + '-' + str(rate)
         for i in range(len(self.file_list)):
             os.system('rm {}'.format(self._prefixName_(i, prefix)))
-            os.system('ffmpeg -i {0} -vf "unsharp=luma_msize_x={1}:luma_msize_y={1}:luma_amount={2}" {3}'.format(self._fullName_(i),size,rate,self._prefixName_(i,prefix)))
+            os.system('ffmpeg -i {0} -vf "unsharp=luma_msize_x={1}:luma_msize_y={1}:luma_amount={2}" {3}'.format(self._fullName_(i),str(size),str(rate),self._prefixName_(i,prefix)))
 
+    def chop(self, rate,code):
+        prefix = 'chop_' + code + '-' + str(rate)
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            if code == 'vertical':
+                os.system('ffmpeg -i {0} -filter_complex "[0]crop=iw*{1}:ih:0:0[tmp1];[0]crop=iw-iw*{1}:ih:iw*{1}:0[tmp2];[tmp2][tmp1]hstack" {2}'.format(self._fullName_(i),str(rate),self._prefixName_(i,prefix)))
+            else:
+                os.system(
+                    'ffmpeg -i {0} -filter_complex "[0]crop=iw:ih*{1}:0:0[tmp1];[0]crop=iw:ih-ih*{1}:0:ih*{1}[tmp2];[tmp2][tmp1]vstack" {2}'.format(
+                        self._fullName_(i), str(rate), self._prefixName_(i, prefix)))
+        return self
 
+    def cut(self,left,right,up,bottom):
+        prefix = 'cur_' + str(left) + '-' + str(right) + '-' + str(up) + '-' + str(bottom)
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            os.system('ffmpeg -i {0} -vf "crop=iw*{1}:ih*{2}:{3}:{4}" {5}'.format(self._fullName_(i),str(left),str(up),str(1-right-left),str(1-up-bottom),self._prefixName_(i,prefix)))
+        return self
+
+    def cover(self,height,width):
+        prefix = 'cover_' + str(height) + '-' + str(width)
+        for i in range(len(self.file_list)):
+            videoCapture = cv2.VideoCapture(self._fullName_(i))
+            x,y = int(videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH))-width,int(videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT))-height
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            os.system('ffmpeg -i {0} -vf "drawbox=x={1}:y={2}:w={3}:h={4}:c=black:t=fill" {5}'.format(self._fullName_(i),str(x),str(y),str(width),str(height),self._prefixName_(i,prefix)))
+        return self
+
+    def brightness(self, rate):
+        prefix = 'bri_' + str(rate)
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            os.system("ffmpeg -i {0} -vf \"format=pix_fmts=rgb24,geq=r='clip(r(X,Y)+{1},0,255)':g='clip(g(X,Y)+{1},0,255)':b='clip(b(X,Y)+{1},0,255)',format=pix_fmts=yuv420p\" {2}".format(
+                self._fullName_(i), str(rate), self._prefixName_(i,prefix)))
+
+    def contrast(self, rate):
+        prefix = 'con_' + str(rate)
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            os.system("ffmpeg -i {0} -vf \"format=pix_fmts=rgb24,geq=r='clip(r(X,Y)*{1},0,255)':g='clip(g(X,Y)*{1},0,255)':b='clip(b(X,Y)*{1},0,255)',format=pix_fmts=yuv420p\" {2}".format(
+                self._fullName_(i), str(rate), self._prefixName_(i,prefix)))
+
+    def saturation(self, rate):
+        prefix = 'sat_' + str(rate)
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            os.system('ffmpeg -i {0} -vf "eq=saturation={1}" {2}'.format(
+                self._fullName_(i), str(rate), self._prefixName_(i,prefix)))
 
     def rotate(self, angle):
         rAngle = np.deg2rad(angle)
@@ -67,13 +115,72 @@ class VideoAttack:
             os.system('ffmpeg -i {0} -vf "rotate={1}:ow=floor(rotw({1})/2)*2:oh=floor(roth({1})/2)*2" {2}'.format(
                 self._fullName_(i), str(rAngle), self._prefixName_(i, 'rot' + str(angle))))
 
+    def hue(self, rate):
+        prefix = 'hue_' + str(rate)
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            os.system('ffmpeg -i {0} -vf "hue=h={1}" {2}'.format(
+                self._fullName_(i), str(rate), self._prefixName_(i,prefix)))
+        return self
 
-'''
+    def resize(self, ratew, rateh):
+        prefix = 'resize_' + str(ratew)+'-'+str(rateh)
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            os.system('ffmpeg -i {0} -vf "scale=w={1}*iw:h={2}*ih" {3}'.format(
+                self._fullName_(i), str(ratew),str(rateh), self._prefixName_(i,prefix)))
+        return self
+
+    def noise(self, rate):
+        #TODO
+        rate = int(np.clip(rate,0,100))
+        prefix = 'hue_' + str(rate)
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            os.system('ffmpeg -i {0} -vf "noise=alls={1}:allf=a" {2}'.format(
+                self._fullName_(i), str(rate), self._prefixName_(i,prefix)))
+        return self
+
+    def flip(self, code):
+        prefix = 'flip_' + code
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            if code == 'vertical':
+                os.system('ffmpeg -i {0} -vf "vflip" {1}'.format(self._fullName_(i), self._prefixName_(i,prefix)))
+            else:
+                os.system('ffmpeg -i {0} -vf "hflip" {1}'.format(self._fullName_(i), self._prefixName_(i, prefix)))
+        return self
+
+    def pro_tran(self,rate=0.05):
+        p1 = [random.uniform(0,rate), random.uniform(0,rate)]
+        p2 = [random.uniform((1.-rate), 1.), random.uniform(0, rate)]
+        p3 = [random.uniform(0, rate), random.uniform((1.-rate), 1.)]
+        p4 = [random.uniform((1.-rate), 1.), random.uniform((1.-rate), 1.)]
+        rate = int(np.clip(rate,0,100))
+        prefix = 'pers_' + str(rate)
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            os.system('ffmpeg -i {0} -vf "perspective=x0={1}*W:y0={2}*H:x1={3}*W:y1={4}*H:x2={5}*W:y2={6}*H:x3={7}*W:y3={8}*H:sense=1:interpolation=cubic" {9}'.format(
+                self._fullName_(i), str(p1[0]),str(p1[1]), str(p2[0]),str(p2[1]), str(p3[0]),str(p3[1]), str(p4[0]),str(p4[1]), self._prefixName_(i,prefix)))
+
+    def liner_blur(self,rate=1.5):
+        prefix = 'dblur_' + str(rate)
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            os.system('ffmpeg -i {0} -vf "dblur=radius={1}" {2}'.format(
+                self._fullName_(i), str(rate), self._prefixName_(i,prefix)))
+        return self
+
+
+
+videoCapture = cv2.VideoCapture('./input/video_debug/66.mp4')
+success, frame = videoCapture.read()
 while success:
+    print(frame)
     cv2.imshow('test',frame)
-    cv2.waitKey(int(1000 /fps))
     success, frame = videoCapture.read()
 '''
 test = VideoAttack()
 test.getFiles()
 test.blur(1,0.6)
+'''

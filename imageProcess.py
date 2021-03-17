@@ -216,7 +216,7 @@ class attack:
 
         return self
 
-    def pro_tran(self):
+    def pro_tran(self,rate=0.05):
         w = self.w
         h = self.h
         p1 = [random.uniform(0, w * 0.05), random.uniform(0, h * 0.05)]
@@ -238,7 +238,7 @@ class attack:
         return self
 
 
-    def cameraScreen(self):
+    def cfa(self):
         w = self.w - (self.w & 1)
         h = self.h - (self.h & 1)
         new_img = np.zeros([h + 3, w + 3, 3], dtype=np.uint8)
@@ -255,7 +255,7 @@ class attack:
         self.w = w
         return self
 
-    def morie(self):
+    def cameraScreen(self):
         new_img = np.zeros([self.h + 2, self.w + 2, 3], dtype=np.uint8)
         for j in range(0, self.h, 3):
             for k in range(0, self.w, 3):
