@@ -62,15 +62,26 @@ def noise_out(image,h,w):
             image[i, j, 2] = clip(image[i, j, 2] + s[2], 0, 255)
     return image
 
+@jit(nopython=True)
+def divide_out(new_img,img,h,w):
+    for j in range(0, h, 3):
+        for k in range(0, w, 3):
+            for i in range(0, 3):
+                new_img[j, k + i, i] = img[j, k, i]
+                new_img[j + 1, k + i, i] = img[j, k, i]
+                new_img[j + 2, k + i, i] = img[j, k, i]
+    return new_img
+
 class attack:
 
-    def __init__(self, filename):
+    def __init__(self, filename,video=0):
         self.compressRate = cv2.IMWRITE_JPEG_QUALITY
         if filename is None:
             return
         self.image = cv2.imread(filename)
         self.h = self.image.shape[0]
         self.w = self.image.shape[1]
+        self.video = video
 
 
     def blur(self,size,rate):
@@ -94,7 +105,7 @@ class attack:
         return self
 
     def cut(self,left,right,up,bottom):
-        self.image = self.image[self.w*left:self.w*(1-right),self.h*up,:self.h*(1-bottom)]
+        self.image = self.image[math.ceil(self.w*left):math.floor(self.w*(1-right)),math.ceil(self.h*up):math.floor(self.h*(1-bottom))]
         self.h = self.image.shape[0]
         self.w = self.image.shape[1]
         return self
@@ -182,7 +193,12 @@ class attack:
 
     def liner_blur(self):
         liner_blur_degree = 3
-        tran = cv2.getRotationMatrix2D((liner_blur_degree / 2, liner_blur_degree / 2), random.uniform(0, 180.), 1)
+        if self.video != 0:
+            angle = self.angle
+        else:
+            angle = random.uniform(120, 160)
+        #print(angle)
+        tran = cv2.getRotationMatrix2D((liner_blur_degree / 2, liner_blur_degree / 2), angle, 1)
         liner_blur_kernel = np.diag(np.ones(liner_blur_degree))
         liner_blur_kernel = cv2.warpAffine(liner_blur_kernel, tran, (liner_blur_degree, liner_blur_degree))
         liner_blur_kernel = liner_blur_kernel / liner_blur_degree
@@ -219,11 +235,15 @@ class attack:
     def pro_tran(self,rate=0.05):
         w = self.w
         h = self.h
-        p1 = [random.uniform(0, w * 0.05), random.uniform(0, h * 0.05)]
-        p2 = [random.uniform(w * 0.95, w), random.uniform(0, h * 0.05)]
-        p3 = [random.uniform(0, w * 0.05), random.uniform(h * 0.95, h)]
-        p4 = [random.uniform(w * 0.95, w), random.uniform(h * 0.95, h)]
-        print("pro_tran:",p1,p2,p3,p4)
+        if self.video != 0:
+            p1,p2,p3,p4 = self.p1,self.p2,self.p3,self.p4
+        else:
+            p1 = [random.uniform(0, w * 0.05), random.uniform(0, h * 0.05)]
+            p2 = [random.uniform(w * 0.95, w), random.uniform(0, h * 0.05)]
+            p3 = [random.uniform(0, w * 0.05), random.uniform(h * 0.95, h)]
+            p4 = [random.uniform(w * 0.95, w), random.uniform(h * 0.95, h)]
+
+        #print("pro_tran:",p1,p2,p3,p4)
         l = math.ceil(min(p1[0], p3[0]))
         r = math.floor(max(p2[0], p4[0]))
         u = math.ceil(min(p1[1], p2[1]))
@@ -231,9 +251,9 @@ class attack:
         tran = cv2.getPerspectiveTransform(np.array([[0, 0], [w, 0], [0, h], [w, h]], dtype='float32'),
                                            np.array([p1, p2, p3, p4], dtype='float32'))
         self.image = cv2.warpPerspective(self.image, tran, (w, h))
-        self.image = self.image[u:b, l:r]
-        self.w = int(r - l)
-        self.h = int(b - u)
+        #self.image = self.image[u:b, l:r]
+        #self.w = int(r - l)
+        #self.h = int(b - u)
 
         return self
 
@@ -256,22 +276,27 @@ class attack:
         return self
 
     def cameraScreen(self):
-        new_img = np.zeros([self.h + 2, self.w + 2, 3], dtype=np.uint8)
-        for j in range(0, self.h, 3):
-            for k in range(0, self.w, 3):
-                for i in range(0, 3):
-                    new_img[j, k + i, i] = self.image[j, k, i]
-                    new_img[j + 1, k + i, i] = self.image[j, k, i]
-                    new_img[j + 2, k + i, i] = self.image[j, k, i]
-        self.image = new_img[0:self.h, 0:self.w, :]
+        if self.video == 1:
+            w = self.w
+            h = self.h
+            self.p1 = [random.uniform(0, w * 0.05), random.uniform(0, h * 0.05)]
+            self.p2 = [random.uniform(w * 0.95, w), random.uniform(0, h * 0.05)]
+            self.p3 = [random.uniform(0, w * 0.05), random.uniform(h * 0.95, h)]
+            self.p4 = [random.uniform(w * 0.95, w), random.uniform(h * 0.95, h)]
+            self.angle = random.uniform(120., 160.)
+            self.alpha, self.beta = random.uniform(0.8, 1.2), random.uniform(-3, 3)
+            self.video = 2
+        self.image = divide_out(np.zeros([self.h + 2, self.w + 2, 3], dtype=np.uint8),self.image,self.h,self.w)[0:self.h, 0:self.w, :]
         self.pro_tran()
         self.liner_blur()
         self.gaussian_blur()
-        alpha,beta = random.uniform(0.8, 1.2),random.uniform(-3, 3)
+        if self.video != 0:
+            alpha, beta = self.alpha,self.beta
+        else:
+            alpha,beta = random.uniform(0.8, 1.2),random.uniform(-3, 3)
         self.image = cv2.convertScaleAbs(self.image, alpha=alpha, beta=beta)
         self.cfa()
         self.gaussian_noise()
-        self.image = cv2.fastNlMeansDenoisingColored(self.image)
         return self
 
 def doRST(img,param,M=512,N=512):
@@ -284,7 +309,7 @@ def doRST(img,param,M=512,N=512):
     return cv2.resize(new.image,(M,N))
 if __name__ == '__main__':
     new = attack('lena.jpg')
-    new.cameraScreen()
+    new = new.cameraScreen()
     cv2.imwrite('dolena.jpg',new.image)
 '''
 print(divide_image(4,4))

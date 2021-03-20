@@ -2,6 +2,7 @@ import cv2
 import os
 import numpy as np
 import random
+import imageProcess
 
 fmt = ['mp4','mp5','avi','yuv','rm','rmvb']
 
@@ -171,8 +172,55 @@ class VideoAttack:
                 self._fullName_(i), str(rate), self._prefixName_(i,prefix)))
         return self
 
+    def translation(self, h, w):
+        prefix = 'move_' + str(w)+'-'+str(h)
+        if w < 0:
+            x = 0
+        else:
+            x = w
+        if h < 0:
+            y = 0
+        else:
+            y = h
+        for i in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(i, prefix)))
+            os.system('ffmpeg -i {0} -vf "pad=iw+{1}:ih+{2}:{3}:{4}" {5}'.format(
+                self._fullName_(i), str(w),str(h),str(x),str(y), self._prefixName_(i,prefix)))
+        return self
+
+    def cameraScreen(self):
+        prefix = 'cfa_'
+        for vn in range(len(self.file_list)):
+            os.system('rm {}'.format(self._prefixName_(vn, prefix)))
+            videoCapture = cv2.VideoCapture(self._fullName_(vn))
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            fps = videoCapture.get(cv2.CAP_PROP_FPS)
+            print(fps)
+            size = (int(videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                    int(videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+            writer = cv2.VideoWriter('.temp.mp4'.format(str(vn)), fourcc, fps, size, True)
+            success, frame = videoCapture.read()
+            cnt = 0
+            out = imageProcess.attack(None,1)
+            out.video=1
+            while success:
+                cnt += 1
+                print("frame {}:".format(str(cnt)))
+                out.image = frame
+                out.w,out.h = size[0],size[1]
+                writer.write(out.cameraScreen().image)
+                success, frame = videoCapture.read()
+
+            writer.release()
+            os.system('rm {}'.format(self._prefixName_(vn, prefix)))
+            os.system('ffmpeg -i {0}  -vf  hqdn3d  {1}'.format(
+                '.temp.mp4', self._prefixName_(vn,prefix)))
+            os.system('rm {}'.format('.temp.mp4'))
 
 
+
+
+'''
 videoCapture = cv2.VideoCapture('./input/video_debug/66.mp4')
 success, frame = videoCapture.read()
 while success:
@@ -182,5 +230,4 @@ while success:
 '''
 test = VideoAttack()
 test.getFiles()
-test.blur(1,0.6)
-'''
+test.cameraScreen()
