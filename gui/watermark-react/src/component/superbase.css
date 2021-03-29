@@ -1,0 +1,40 @@
+ .logo {
+    height: 60px;
+    width: 60px;
+    margin: 2px;
+    float: left;
+    background: rgba(255, 255, 255, 0.3);
+  }
+  
+  .site-layout .site-layout-background {
+    background: #fff;
+  }
+
+  .header {
+    padding-left: 20px;
+    padding-right: 0px;
+  }
+
+  .title {
+    padding-left: 10px;
+    padding-right: 20px;
+    color: palevioletred;
+    font-weight: bolder;
+    font-size: larger;
+    float: left;
+  }
+
+  .content{
+    padding-top: 20px;
+    padding-bottom: 20px;
+    color: #fff;
+  }
+
+  .layout{
+    background: #fff;
+  }
+
+  .cardWrapper{
+    padding: 30px;
+    display: flex;
+  }

@@ -1,0 +1,32 @@
+.cardTitle{
+    text-align: center;
+    font-size: 32px;
+}
+
+#t1{
+    color: #52c41a;
+}
+
+#t2{
+    color: red;
+}
+
+#t3{
+    color: blue;
+}
+
+#t4{
+    color: sandybrown;
+}
+
+#t5{
+    color: purple;
+}
+
+.description{
+    font-size: 20px;
+}
+
+.card{
+    min-height: 480px;
+}
