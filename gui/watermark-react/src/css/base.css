@@ -1,0 +1,95 @@
+.content {
+  margin: 8px 16px;
+  padding: 16px;
+  min-height: 360px;
+}
+.conta{
+  margin: 0px 100px;
+}
+.topbar{
+  padding: 1.4rem 2rem;
+  background-color: white;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  align-items: center;
+  display: flex;
+}
+.inline-search-form {
+}
+
+.inline-search-form .ant-form-item {
+  display: flex;
+}
+
+.inline-search-form .ant-form-item-label {
+  overflow: visible;
+}
+
+th.table-middle{
+  text-align: center !important;
+  padding: 16px 1px !important;
+}
+td.table-middle{
+  text-align: center !important;
+  padding: 5px 1px !important;
+}
+
+
+.ant-carousel .slick-slide {
+  text-align: center;
+  height: 300px;
+  line-height: 160px;
+  background: #364d79;
+  overflow: hidden;
+}
+
+.ant-carousel .slick-slide h3 {
+  color: #fff;
+}
+
+.ant-breadcrumb{
+  padding-left:2rem;
+}
+
+.black-link{
+  color: #333;
+  font-size: 1.2rem;
+  line-height: 1.2;
+
+}
+.black-link-small{
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.green-link{
+  color: #41B146;
+  font-size: 1.2rem;
+  line-height: 1.2;
+
+}
+
+.menu-item{
+  padding: 1rem 1.2rem;
+  margin: 1rem 1.2rem;
+}
+
+.dropdown{
+  margin-right: 1.5rem;
+  vertical-align:middle;
+}
+
+.vdivider{
+  height: 1.8rem;
+}
+
+p{
+  text-indent: 2rem;
+  font-family: Helvetica, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', Arial, sans-serif;
+}
+.contentContainer{
+  background-color: white;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+}
