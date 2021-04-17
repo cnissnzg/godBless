@@ -135,7 +135,7 @@ class VideoAttack:
     def noise(self, rate):
         #TODO
         rate = int(np.clip(rate,0,100))
-        prefix = 'hue_' + str(rate)
+        prefix = 'noise_' + str(rate)
         for i in range(len(self.file_list)):
             os.system('rm {}'.format(self._prefixName_(i, prefix)))
             os.system('ffmpeg -i {0} -vf "noise=alls={1}:allf=a" {2}'.format(

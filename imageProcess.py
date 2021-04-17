@@ -290,12 +290,13 @@ class attack:
         self.pro_tran()
         self.liner_blur()
         self.gaussian_blur()
+        self.cfa()
+        #moved down
         if self.video != 0:
             alpha, beta = self.alpha,self.beta
         else:
             alpha,beta = random.uniform(0.8, 1.2),random.uniform(-3, 3)
         self.image = cv2.convertScaleAbs(self.image, alpha=alpha, beta=beta)
-        self.cfa()
         self.gaussian_noise()
         return self
 
