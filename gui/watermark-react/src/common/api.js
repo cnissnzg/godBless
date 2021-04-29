@@ -4,9 +4,9 @@ api接口配置
 //本地打包
 //const host = 'http://localhost:12306/watermark';
 //浏览器
-const host = '/watermark';
+const host = '/api/v1/watermark';
 const Api = {
-  login: host + '/api/v1/user/login/',
+  login: host + '/user/login',
 
 
   admin:{
@@ -68,7 +68,7 @@ const Api = {
     getgroupsecret : gid => host + '/api/v1/user/getgroupsecret/?gid='+gid,
     getgroupmd5 : gid => host + '/api/v1/user/getgroupmd5/?gid='+gid,
     changepassword : host + '/api/v1/user/changepassword/',
-    register : host + '/api/v1/user/register/',
+    register : host + '/user/register/',
     groupauth : host + '/api/v1/user/groupauth/',
     getseatlist : (cid)=>host + '/api/v1/user/getseatlist/?cid='+cid,
     addseat : host + '/api/v1/user/addseat/',
@@ -79,7 +79,7 @@ const Api = {
     getstarlist : (cid)=>host + '/api/v1/user/getstarlist/?cid='+cid,
     addstar : host + '/api/v1/user/addstar/',
     cleanstar : host + '/api/v1/user/cleanstar/',
-    getCaptcha : host + '/api/v1/user/getCaptcha/',
+    getCaptcha : host + '/user/captcha/',
   },
 
   blog : {

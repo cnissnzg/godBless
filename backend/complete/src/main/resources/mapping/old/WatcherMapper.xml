@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.WatcherMapper">
+    <select id="getWatcher" resultType="com.example.entity.Watcher">
+        SELECT * FROM teachingassistant.watcher WHERE `idRoom`=#{idRoom};
+    </select>
+    <insert id="addWatcher">
+        INSERT INTO `teachingassistant`.`watcher` (`idRoom`, `username`) VALUES (#{idRoom}, #{username});
+    </insert>
+    <delete id="delRoom">
+        DELETE FROM `teachingassistant`.`watcher` WHERE `idRoom`=#{idRoom};
+    </delete>
+    <delete id="delWatcher">
+        DELETE FROM `teachingassistant`.`watcher` WHERE `idRoom`=#{idRoom} AND `username`=#{username};
+    </delete>
+</mapper>

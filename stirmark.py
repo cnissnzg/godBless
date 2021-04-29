@@ -28,7 +28,7 @@ class imgINI():
 
     def blur(self, size,rate):
         self.INI.append({
-            "name": "blur",
+            "cid": "blur",
             "size":size,
             "rate": rate
         })
@@ -36,44 +36,44 @@ class imgINI():
 
     def contrast(self, rate):
         self.INI.append({
-            "name": "contrast",
+            "cid": "contrast",
             "rate": rate
         })
 
     def saturation(self, rate):
         self.INI.append({
-            "name": "saturation",
+            "cid": "saturation",
             "rate": rate
         })
 
 
     def hue(self, rate):
         self.INI.append({
-            "name": "hue",
+            "cid": "hue",
             "rate": rate
         })
 
     def sharpen(self, size):
         self.INI.append({
-            "name": "sharpen",
+            "cid": "sharpen",
             "size": size
         })
 
     def rotate(self,angle):
         self.INI.append({
-            "name": "rotate",
+            "cid": "rotate",
             "angle": angle
         })
 
     def flip(self,code):
         self.INI.append({
-            "name": "flip",
+            "cid": "flip",
             "code": code
         })
 
     def cut(self,left,right,up,bottom):
         self.INI.append({
-            "name": "cur",
+            "cid": "cut",
             "left": left,
             "right":right,
             "up":up,
@@ -82,35 +82,35 @@ class imgINI():
 
     def cover(self,height,width):
         self.INI.append({
-            "name": "cover",
+            "cid": "cover",
             "height": height,
             "width":width
         })
 
     def chop(self,rate,code):
         self.INI.append({
-            "name": "chop",
+            "cid": "chop",
             "rate": rate,
             "code":code
         })
 
     def resize(self,ratew,rateh):
         self.INI.append({
-            "name": "resize",
+            "cid": "resize",
             "ratew": ratew,
             "rateh": rateh
         })
 
     def translation(self,h,w):
         self.INI.append({
-            "name": "translation",
+            "cid": "translation",
             "height": h,
             "width": w
         })
 
     def cameraScreen(self):
         self.INI.append({
-            "name": "cameraScreen"
+            "cid": "cameraScreen"
         })
 
 
@@ -121,8 +121,10 @@ test.resize(10,10)
 test.rotate(45)
 
 test.save()
+'''
 test.clear()
 test.load()
 atk = imageProcess.attack('lena.jpg')
 test.execute(atk)
 cv2.imwrite('dolena.jpg',atk.image)
+'''

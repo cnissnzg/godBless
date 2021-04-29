@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CourseMapper">
+    <insert id="addCourse" parameterType="com.example.entity.Course">
+        INSERT INTO `teachingassistant`.`course` (`title`, `tid`, `tname`, `pic`) VALUES (#{title}, #{tid}, #{tname}, #{pic});
+    </insert>
+    <select id="getAllCourse" resultType="com.example.entity.Course">
+        SELECT * FROM teachingassistant.course;
+    </select>
+    <select id="getId" resultType="Integer">
+        SELECT idcourse FROM  teachingassistant.course WHERE title = #{title};
+    </select>
+</mapper>

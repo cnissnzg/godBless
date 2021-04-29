@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.TeacherMapper">
+    <insert id="insertTeacher" parameterType="com.example.entity.Teacher">
+        INSERT INTO `teachingassistant`.`teachers` (`username`, `tid`, `name`, `academy`, `major`, `grade`) VALUES (#{username}, #{tid}, #{name}, #{academy}, #{major}, #{grade});
+    </insert>
+    <delete id="deleteTeacher">
+        DELETE FROM `teachingassistant`.`teachers` WHERE `username`=#{username};
+    </delete>
+    <update id="updateTeacher">
+        UPDATE `teachingassistant`.`teachers` SET `tid`=#{teacher.tid}, `name`=#{teacher.name}, `academy`=#{teacher.academy}, `major`=#{teacher.major}, `grade`=#{teacher.grade} WHERE `username`=#{username};
+    </update>
+    <select id="getOneTeacher" resultType="com.example.entity.Teacher">
+        SELECT * FROM teachingassistant.teachers WHERE `username`=#{username};
+    </select>
+</mapper>

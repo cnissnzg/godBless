@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CommentMapper">
+    <insert id="addComment" parameterType="com.example.entity.Comment">
+        INSERT INTO `teachingassistant`.`comment` (`time`, `username`, `content`, `idRoom`) VALUES (#{time}, #{username},#{content},#{idRoom});
+    </insert>
+    <select id="getComment" resultType="com.example.entity.Comment">
+        SELECT * FROM teachingassistant.comment WHERE idRoom = #{idRoom} AND `time` >= #{time};
+    </select>
+</mapper>

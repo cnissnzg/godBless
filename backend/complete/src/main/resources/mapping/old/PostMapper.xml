@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.PostMapper">
+    <insert id="addPost" parameterType="com.example.entity.Post">
+        INSERT INTO `teachingassistant`.`posts` (`poster`, `text`, `title`) VALUES (#{poster}, #{text}, #{title});
+    </insert>
+    <delete id="delPost">
+        DELETE FROM `teachingassistant`.`posts` WHERE `pid`=#{id};
+    </delete>
+    <select id="getAllPosts" resultType="com.example.entity.Post">
+        SELECT * FROM teachingassistant.posts;
+    </select>
+    <select id="getMyPosts" resultType="com.example.entity.Post">
+        SELECT * FROM teachingassistant.posts WHERE `poster`=#{username};
+    </select>
+    <select id="getOnePost" resultType="com.example.entity.Post">
+        SELECT * FROM teachingassistant.posts WHERE `pid`=#{id};
+    </select>
+    <update id="updateText">
+        UPDATE `teachingassistant`.`posts` SET `text`=#{text} WHERE `pid`=#{id};
+    </update>
+    <update id="updateLast">
+        UPDATE `teachingassistant`.`posts` SET `lastReplyNum`=#{lastReply} WHERE `pid`=#{id};
+    </update>
+</mapper>

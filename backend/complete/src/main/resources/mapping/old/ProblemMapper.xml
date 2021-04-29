@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ProblemMapper">
+    <insert id="addProblem" parameterType="com.example.entity.Problem">
+        INSERT INTO `teachingassistant`.`problems` (`textMain`, `textA`, `textB`, `textC`, `textD`, `A`, `B`, `C`, `D`) VALUES (#{textMain}, #{textA} , #{textB}, #{textC}, #{textD}, #{A}, #{B}, #{C}, #{D});
+    </insert>
+
+    <select id="getAllProblems" resultType="com.example.entity.Problem">
+        SELECT * FROM teachingassistant.problems;
+    </select>
+
+    <select id="getOneProblem" resultType="com.example.entity.Problem">
+        SELECT * FROM teachingassistant.problems WHERE `tid`=#{id};
+    </select>
+
+    <delete id="delProblem">
+        DELETE FROM `teachingassistant`.`problems` WHERE `tid`=#{id};
+    </delete>
+
+    <update id="updateProblem">
+        UPDATE `teachingassistant`.`problems` SET `textMain`=#{p.textMain}, `textA`=#{p.textA}, `textB`=#{p.textB}, `textC`=#{p.textC}, `textD`=#{p.textD}, `isA`=#{p.isA}, `isB`=#{p.isB}, `isC`=#{p.isC}, `isD`=#{p.isD} WHERE `tid`=#{id};
+    </update>
+</mapper>

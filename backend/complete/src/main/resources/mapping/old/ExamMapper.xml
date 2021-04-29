@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ExamMapper">
+    <insert id="addExam" parameterType="com.example.entity.Exam">
+        INSERT INTO `teachingassistant`.`exams` (`problemNum`, `teacherId`, `usable`, `problemList`) VALUES (#{problemNum}, #{teacherId}, #{usable}, #{problemList});
+    </insert>
+
+    <select id="getAllExam" resultType="com.example.entity.Exam">
+        SELECT * FROM teachingassistant.exams;
+    </select>
+
+    <select id="getOneExam" resultType="com.example.entity.Exam">
+        SELECT * FROM teachingassistant.exams WHERE `eid`=#{eid};
+    </select>
+
+    <delete id="delExam">
+        DELETE FROM `teachingassistant`.`exams` WHERE `eid`=#{eid};
+    </delete>
+
+    <update id="updateExam">
+        UPDATE `teachingassistant`.`exams` SET `problemNum`=#{exam.problemNum}, `teacherId`=#{exam.teacherId}, `usable`=#{exam.usable}, `problemList`=#{exam.problemList} WHERE `eid`=#{eid};
+    </update>
+
+</mapper>

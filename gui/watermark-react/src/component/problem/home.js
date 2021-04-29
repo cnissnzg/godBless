@@ -10,33 +10,30 @@ import Title from 'antd/lib/typography/Title';
 const { Search } = Input;
 const { CheckableTag } = Tag;
 const columns = [{
-  title: 'PID',
+  title: 'ID',
   dataIndex: 'pid',
   width: '10%',
   sorter: (a, b) => a.pid - b.pid,
 }, {
-  title: 'Title',
+  title: '标题',
   dataIndex: 'title',
-  width: '55%',
+  width: '45%',
   render: (text, record, index) => {
     const link = Url.problem.detail(record.pid);
     return <Link to={link}>{text}</Link>;
   },
 }, {
-  title: 'Ratio',
-  dataIndex: 'ratio',
+  title: '素材数',
+  dataIndex: 'materialCnt',
   width: '10%',
-  render: (text, record, index) => {
-    if (record.cCnt === 0) return "0.00%";
-    else return Number(100 * record.acCnt / record.cCnt).toFixed(2) + '%';
-  },
+  sorter: (a, b) => a.materialCnt - b.materialCnt,
 }, {
-  title: 'AC',
-  dataIndex: 'acCnt',
+  title: '测试数',
+  dataIndex: 'testCnt',
   width: '10%',
-  sorter: (a, b) => a.acCnt - b.acCnt,
+  sorter: (a, b) => a.testCnt - b.testCnt,
 }, {
-  title: 'Total',
+  title: '热度',
   dataIndex: 'cCnt',
   width: '10%',
   sorter: (a, b) => a.cCnt - b.cCnt,
@@ -127,10 +124,10 @@ class ProblemList extends React.Component {
       }
       */
       const pagination = { ...this.state.pagination };
-      pagination.total = 1;//TODO
+      pagination.total = response.data.total;
       this.setState({
         loading: false,
-        data: response.data,
+        data: response.data.problems,
         pagination,
       })
     }).catch((error) => { console.log('wtf') });
@@ -168,7 +165,6 @@ class ProblemList extends React.Component {
             <Breadcrumb separator="  ">
               <Breadcrumb.Item href=""><span class="green-link">视频测试集</span></Breadcrumb.Item>
               <Breadcrumb.Item href=""><span className="black-link">图片测试集</span></Breadcrumb.Item>
-              <Breadcrumb.Item href=""><span className="black-link">音频测试集</span></Breadcrumb.Item>
             </Breadcrumb>
             <Search
               placeholder="搜索ID"

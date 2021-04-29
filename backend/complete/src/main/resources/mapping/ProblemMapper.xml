@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.watermark.mapper.ProblemMapper">
+
+    <select id="getProblemList" resultType="com.watermark.entity.Problem">
+        SELECT pid,title,acCnt,cCnt,materialCnt,testCnt FROM Watermark.Problem WHERE pid >= (SELECT pid FROM Watermark.Problem limit #{start},1) limit #{end};
+    </select>
+    <select id="getTot" resultType="int">
+        SELECT count(pid) as tot FROM Watermark.Problem;
+    </select>
+</mapper>

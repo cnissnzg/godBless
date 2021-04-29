@@ -1,0 +1,30 @@
+server:
+  port: 12306
+  #ssl:
+   # key-store: classpath:static/tomcat.key
+   # key-store-password: 41cnissnzghyf
+   # key-store-type: JKS
+   # key-alias: tomcat
+   # ciphers: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384, TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_RC4_128_SHA, TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA, TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA, SSL_RSA_WITH_RC4_128_SHA
+
+spring:
+  servlet:
+    multipart:
+      max-request-size: 100MB
+      max-file-size: 100MB
+  datasource:
+    url: jdbc:mysql://39.105.21.114:3306/Watermark?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: 41cnissnzghyf
+    driver-class-name: com.mysql.jdbc.Driver
+
+mybatis:
+    mapper-locations: classpath:mapping/*Mapper.xml
+    type-aliases-package: com.ocean.pojo
+    config-location: classpath:configuring/mybatis-config.xml
+
+logging:
+  file:
+    name: myApp.log
+    path: /myApp/log
+

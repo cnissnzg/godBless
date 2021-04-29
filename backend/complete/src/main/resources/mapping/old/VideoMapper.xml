@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.VideoMapper">
+    <select id="getMyVideos" resultType="com.example.entity.Video">
+        SELECT * FROM teachingassistant.videos WHERE `idcourse`=#{idcourse};
+    </select>
+    <insert id="addVideo" parameterType="com.example.entity.Video">
+        INSERT INTO `teachingassistant`.`videos` (`idcourse`, `title`, `file`) VALUES (#{idcourse}, #{title}, #{file});
+    </insert>
+</mapper>

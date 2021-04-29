@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.SubmitMapper">
+    <insert id="insertSubmit" parameterType="com.example.entity.SubmitItem">
+        INSERT INTO `teachingassistant`.`submit` (`username`, `timeStamp`, `eid`, `score`, `chosen`, `result`) VALUES (#{username}, #{timeStamp}, #{eid}, #{score}, #{chosen}, #{result});
+    </insert>
+    <select id="getStudentSubmit" resultType="com.example.entity.SubmitItem">
+        SELECT * FROM teachingassistant.submit WHERE `username`=#{username};
+    </select>
+</mapper>

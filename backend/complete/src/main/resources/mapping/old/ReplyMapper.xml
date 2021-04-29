@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ReplyMapper">
+    <insert id="addReply" parameterType="com.example.entity.Reply">
+      INSERT INTO `teachingassistant`.`replys` (`postId`, `username`, `text`) VALUES (#{postId}, #{username}, #{text});
+    </insert>
+    <delete id="delReply">
+      DELETE FROM `teachingassistant`.`replys` WHERE `rid`=#{id};
+    </delete>
+    <select id="getOneReply" resultType="com.example.entity.Reply">
+      SELECT * FROM teachingassistant.replys WHERE `rid`=#{id};
+    </select>
+    <select id="getReplysOfPost" resultType="com.example.entity.Reply">
+      SELECT * FROM teachingassistant.replys WHERE `postId`=#{pid};
+    </select>
+    <update id="updateText">
+      UPDATE `teachingassistant`.`replys` SET `text`=#{text} WHERE `rid`=#{id};
+    </update>
+</mapper>

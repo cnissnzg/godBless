@@ -31,7 +31,7 @@ const Url = {
     status: prefix+'/status',
   },
 
-  hojuser:{
+  user:{
     detail: uid => prefix+"/user/"+uid,
     logout: prefix+"/logout",
     changepassword: prefix+"/changepassword",

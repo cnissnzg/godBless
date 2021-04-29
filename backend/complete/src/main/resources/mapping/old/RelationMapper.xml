@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.RelationMapper">
+    <insert id="addRelation">
+        INSERT INTO `teachingassistant`.`relations` (`student`, `teacher`) VALUES (#{student}, #{teacher});
+    </insert>
+    <delete id="delRelation">
+        DELETE FROM teachingassistant.relations WHERE `student`=#{student} AND `teacher`=#{teacher};
+    </delete>
+    <select id="getAllTeacher" resultType="com.example.entity.Relation">
+        SELECT * FROM `teachingassistant`.`relations` WHERE `student`=#{student}
+    </select>
+    <select id="getAllStudent" resultType="com.example.entity.Relation">
+      SELECT * FROM `teachingassistant`.`relations` WHERE `teacher`=#{teacher}
+    </select>
+</mapper>
