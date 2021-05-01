@@ -1,3 +1,0 @@
-/root/watermark/godBless/algorithm/FFTWatermark/build/CMakeFiles/edit_cache.dir
-/root/watermark/godBless/algorithm/FFTWatermark/build/CMakeFiles/rebuild_cache.dir
-/root/watermark/godBless/algorithm/FFTWatermark/build/CMakeFiles/FFTWatermark.dir
