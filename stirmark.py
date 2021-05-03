@@ -1,8 +1,13 @@
 import imageProcess
 import json
 import cv2
+import os
 
-class imgINI():
+INI_PATH = './settings/setting.ini'
+INPUT_PATH = './input/'
+OUTPUT_PATH = './output/'
+
+class commonINI():
 
     def __init__(self, path):
         self.path = path
@@ -20,11 +25,20 @@ class imgINI():
             self.INI = json.load(f)
         print(self.INI)
 
-    def execute(self,atk):
+    def execute(self,filename):
+        f = filename.split('.')
+        f[1] = '.'+f[1]
+        i = 0
         for funcName in self.INI:
-            func = getattr(atk,funcName['name'])
-            funcName.pop('name')
+            atk = imageProcess.attack(INPUT_PATH+f[0]+f[1])
+            func = getattr(atk,funcName['cid'])
+            funcName.pop('cid')
             atk = func(**funcName)
+            dirs = OUTPUT_PATH+f[0]
+            if not os.path.exists(dirs):
+                os.makedirs(dirs)
+            cv2.imwrite(dirs+'/'+f[0]+str(i)+f[1],atk.image)
+            i+=1
 
     def blur(self, size,rate):
         self.INI.append({
@@ -113,18 +127,45 @@ class imgINI():
             "cid": "cameraScreen"
         })
 
+    def pro_tran(self):
+        self.INI.append({
+            "cid": "pro_tran"
+        })
 
-test = imgINI('./settings/setting.ini')
+    def liner_blur(self):
+        self.INI.append({
+            "cid": "liner_blur"
+        })
+
+class imgINI(commonINI):
+
+    def jpeg(self,rate):
+        self.INI.append({
+            "cid": "jpeg",
+            "rate": rate,
+        })
+
+    def saltNoise(self,num):
+        self.INI.append({
+            "cid": "saltNoise",
+            "rate": num,
+        })
+
+class videoINI(commonINI):
+
+    def debug(self):
+        print("debug")
+
+
+test = imgINI(INI_PATH)
 test.cameraScreen()
 #test.blur(10,0.5)
-test.resize(10,10)
+test.resize(0.8,0.9)
 test.rotate(45)
 
 test.save()
-'''
+
 test.clear()
 test.load()
-atk = imageProcess.attack('lena.jpg')
-test.execute(atk)
-cv2.imwrite('dolena.jpg',atk.image)
-'''
+
+test.execute('lena.jpg')

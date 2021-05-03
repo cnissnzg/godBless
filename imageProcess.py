@@ -207,11 +207,13 @@ class attack:
         self.image = np.array(self.image, dtype=np.uint8)
         return self
 
+
     def gaussian_blur(self):
         gaussian_blur_size = 3
         self.image = cv2.GaussianBlur(self.image, ksize=(gaussian_blur_size, gaussian_blur_size), sigmaX=0, sigmaY=0)
         self.image = gaussian_out(self.h,self.w,self.image)
         return self
+
 
     def gaussian_noise(self):
         self.h = self.image.shape[0]
