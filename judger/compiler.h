@@ -11,6 +11,7 @@
 #include "fileOperator.h"
 
 #include <sys/resource.h>
+#include <sys/wait.h>
 #include <csignal>
 #ifdef __i386
 #define REG_SYSCALL orig_eax

@@ -7,7 +7,7 @@
  */
 int main(int argc,char* argv[]) {
     if(argc < 8){
-        cout<<"!!!";
+        cout<<"not enough args!";
         return 0;
     }
     int lang = getLanguage(string(argv[1]));

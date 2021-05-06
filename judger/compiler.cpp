@@ -9,15 +9,10 @@ void handler_24( int signo)
     alarm(0);
 }
 
-
 compiler::compiler(int lang, const problem &problemInfo, logger &logfile) : lang(lang), problemInfo(problemInfo),
-                                                                                  logfile(logfile) {
+                                                                                  logfile(logfile) {}
 
-
-
-}
-
-void compiler::compile()  {
+int compiler::compile()  {
     clean_workdir(WORK_DIR,logfile);
     chroot(WORK_DIR.c_str());
 
@@ -51,5 +46,12 @@ void compiler::compile()  {
                 logfile.writeLog("not support");
         }
         exit(0);
+    }else{
+        int status = 0;
+        waitpid(pid, &status, 0);
+        execute_cmd("/bin/umount bin usr lib lib64 etc/alternatives proc dev 2>/dev/null");
+        execute_cmd("/bin/umount %s/* 2>/dev/null",WORK_DIR.c_str());
+
+        return status;
     }
 }
