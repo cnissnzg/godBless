@@ -36,6 +36,7 @@ int compiler::compile()  {
 
         freopen("ce.txt", "w", stderr);
         char *noArgv[] = {(char *) nullptr};
+        setId()
         switch (lang) {
             case 1:
                 execv("cmake && make",noArgv);

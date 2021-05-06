@@ -8,4 +8,5 @@
 void mount();
 void clean_workdir(const string &work_dir,logger &logfile);
 void setId();
+void umount(const char * work_dir);
 #endif //JUDGER_FILEOPERATOR_H
