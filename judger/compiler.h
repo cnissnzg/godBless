@@ -31,7 +31,7 @@ class compiler {
     logger &logfile;
 public:
     compiler(int lang, const problem &problemInfo, logger &logfile);
-    void compile();
+    int compile();
 };
 
 
