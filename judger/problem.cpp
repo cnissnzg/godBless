@@ -8,3 +8,4 @@
 problem::problem(int timeLimit, int memLimit, int type, const string &inputDir, const string &outputDir,
                  const string &checkDir) : timeLimit(timeLimit), memLimit(memLimit), type(type), inputDir(inputDir),
                                            outputDir(outputDir), checkDir(checkDir) {}
+

@@ -10,7 +10,9 @@ struct problem{
     string outputDir;
     string checkDir;
 
+
     problem(int timeLimit, int memLimit, int type, const string &inputDir, const string &outputDir,
             const string &checkDir);
+
 };
 #endif //JUDGER_PROBLEM_H
