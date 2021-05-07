@@ -9,3 +9,4 @@ problem::problem(int timeLimit, int memLimit, int type, const string &inputDir, 
                  const string &checkDir) : timeLimit(timeLimit), memLimit(memLimit), type(type), inputDir(inputDir),
                                            outputDir(outputDir), checkDir(checkDir) {}
 
+problem::problem(int _type,const string &_pid,const string &_sourceId):type(_type),problemid(_pid),sourceId(_sourceId){}

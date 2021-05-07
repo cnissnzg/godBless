@@ -9,7 +9,7 @@ void handler_24( int signo)
     alarm(0);
 }
 
-compiler::compiler(int lang, const problem &problemInfo, logger &logfile) : lang(lang), problemInfo(problemInfo),
+compiler::compiler(const problem &problemInfo, logger &logfile) : problemInfo(problemInfo),
                                                                                   logfile(logfile) {}
 
 int compiler::compile()  {
@@ -37,7 +37,7 @@ int compiler::compile()  {
         freopen("ce.txt", "w", stderr);
         char *noArgv[] = {(char *) nullptr};
         setId();
-        switch (lang) {
+        switch (problemInfo.type) {
             case 1:
                 execv("cmake && make",noArgv);
                 break;

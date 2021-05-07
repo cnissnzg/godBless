@@ -15,7 +15,7 @@
 
 using namespace std;
 const string JUDGER_HOME = "/home/judger/";
-const string LOG_DIR = JUDGER_HOME + "log/";
+const string LOG_DIR = JUDGER_HOME + "log";
 const string WORK_DIR = JUDGER_HOME + "run";
 
 #define BUFFER_SIZE 5120

@@ -4,7 +4,7 @@
 
 #include "logger.h"
 logger::logger() {
-    filename = LOG_DIR + "log.txt";
+    filename = LOG_DIR + "/log.txt";
     logStream.open(filename, ios::out | ios::app );
 
 }

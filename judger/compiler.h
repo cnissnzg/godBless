@@ -26,11 +26,10 @@
 
 #endif
 class compiler {
-    int lang;
     problem problemInfo;
     logger &logfile;
 public:
-    compiler(int lang, const problem &problemInfo, logger &logfile);
+    compiler(const problem &problemInfo, logger &logfile);
     int compile();
 };
 

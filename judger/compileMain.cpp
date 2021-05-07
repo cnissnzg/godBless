@@ -7,24 +7,22 @@
  * judge (language)
  */
 int main(int argc,char* argv[]) {
-    if(argc < 8){
+    if(argc < 3){
         cout<<"not enough args!";
-        return 0;
+        return -2;
     }
-    /*
     int lang = getLanguage(string(argv[1]));
-    problem problemInfo(atoi(argv[2]), atoi(argv[3]), atoi(argv[4]),string(argv[5]),string(argv[6]),string(argv[7]));
+    problem problemInfo(lang,string(argv[1]),string(argv[2]));
     logger logfile(argc,argv);
-    compiler tmp(lang,problemInfo,logfile);
+    compiler tmp(problemInfo,logfile);
     int compileRet = tmp.compile();
     if (compileRet != 0) {
-        execute_cmd("/bin/cp '%s'/ce.txt %s/ce.info", WORK_DIR.c_str(), JUDGER_HOME.c_str());
+        execute_cmd("/bin/cp %s/ce.txt %s/ce.info", WORK_DIR.c_str(), JUDGER_HOME.c_str());
         clean_workdir(WORK_DIR,logfile);
         logfile.writeLog("compile error");
         return -1;
     }else{
         umount(WORK_DIR.c_str());
     }
-     */
     return 0;
 }
