@@ -1,1 +1,2 @@
-judger/cmake-build-debug*
+/judger/cmake-build-debug*
+/algorithm/sample/build*
