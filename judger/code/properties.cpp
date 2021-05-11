@@ -10,14 +10,16 @@ int execute_cmd(const char * fmt, ...) {
 
     va_start(ap, fmt);
     vsprintf(cmd, fmt, ap);
+    cout<<cmd<<endl;
     ret = system(cmd);
     va_end(ap);
     return ret;
 }
 int getLanguage(const string &s){
 if(s=="C") return 1;
-if(s=="CPP") return 2;
+if(s=="CPP") return 1;
+if(s=="PY2") return 2;
 if(s=="JAVA") return 3;
-if(s=="PY2") return 4;
+if(s=="PY3") return 4;
 return -1;
 }

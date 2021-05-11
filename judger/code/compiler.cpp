@@ -13,9 +13,8 @@ compiler::compiler(const problem &problemInfo, logger &logfile) : problemInfo(pr
                                                                                   logfile(logfile) {}
 
 int compiler::compile()  {
-    clean_workdir(WORK_DIR,logfile);
+    chdir(WORK_DIR.c_str());
     chroot(WORK_DIR.c_str());
-
     int pid = fork();
     if(pid < 0){
         logfile.writeLog("Error fork");
@@ -34,12 +33,12 @@ int compiler::compile()  {
 
         mount();
 
-        freopen("ce.txt", "w", stderr);
-        char *noArgv[] = {(char *) nullptr};
+        freopen("ce2.txt", "w", stderr);
         setId();
         switch (problemInfo.type) {
             case 1:
-                execv("cmake && make",noArgv);
+                cout<<"cm"<<endl;
+                cout<<execute_cmd("cmake %s/ && make %s/",WORK_DIR.c_str(),WORK_DIR.c_str());
                 break;
             case 2:
                 execl("python", "main.py",(char *) nullptr);
@@ -52,7 +51,7 @@ int compiler::compile()  {
         waitpid(pid, &status, 0);
         execute_cmd("/bin/umount bin usr lib lib64 etc/alternatives proc dev 2>/dev/null");
         execute_cmd("/bin/umount %s/* 2>/dev/null",WORK_DIR.c_str());
-
+        cout<<"fa"<<endl;
         return status;
     }
 }

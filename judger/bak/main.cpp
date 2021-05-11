@@ -1,8 +1,8 @@
-#include "properties.h"
-#include "problem.h"
-#include "logger.h"
-#include "compiler.h"
-#include "fileOperator.h"
+#include "../code/properties.h"
+#include "../code/problem.h"
+#include "../code/logger.h"
+#include "../code/compiler.h"
+#include "../code/fileOperator.h"
 /*
  * judge (language)
  */

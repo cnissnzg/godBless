@@ -21,7 +21,7 @@ void clean_workdir(const string &work_dir,logger &logfile) {
 }
 void mount(){
     execute_cmd("mkdir -p bin usr lib lib64 etc/alternatives proc tmp dev");
-    execute_cmd("chown judge *");
+    execute_cmd("chown judger *");
     execute_cmd("mount -o bind /bin bin");
     execute_cmd("mount -o bind /usr usr");
     execute_cmd("mount -o bind /lib lib");
