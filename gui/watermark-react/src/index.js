@@ -9,6 +9,7 @@ import ProblemDetail from './component/problem/detail';
 import ProblemSubmit from './component/problem/submit';
 import Register from './component/user/register';
 import Login from './component/login';
+import CodeEitor from './component/code/editor';
 ReactDOM.render((
   <Router>
     <Switch>
@@ -18,6 +19,7 @@ ReactDOM.render((
       <Route path={Url.problem.submit(":pid") } component={ProblemSubmit} />
       <Route exact path={Url.user.register} component={Register} />
       <Route exact path={Url.login} component={Login} />
+      <Route exact path={Url.code.editor} component={CodeEitor} />
     </Switch>
   </Router>
 ),

@@ -1,26 +1,30 @@
 package com.watermark.entity;
 
+import java.util.*;
+
 public class Problem {
   private int pid;
   private int uid;
   private int uCount;
   private int cCnt;
-  private int pCnt;
-  private double acPnt;
-  private double acgPnt;
   private int acCnt;
   private String title;
   private int materialCnt;
   private int testCnt;
 
-  public Problem(int pid, int uid, int uCount, int cCnt, int pCnt, double acPnt, double acgPnt, int acCnt, String title) {
+  private String description;
+  private List<String> Tags;
+
+  private int timeLimit;
+  private int memoryLimit;
+  private double bitErrorLimit;
+  private double qualityLimit;
+
+  public Problem(int pid, int uid, int uCount, int cCnt, int acCnt, String title) {
     this.pid = pid;
     this.uid = uid;
     this.uCount = uCount;
     this.cCnt = cCnt;
-    this.pCnt = pCnt;
-    this.acPnt = acPnt;
-    this.acgPnt = acgPnt;
     this.acCnt = acCnt;
     this.title = title;
   }
@@ -60,30 +64,6 @@ public class Problem {
     this.cCnt = cCnt;
   }
 
-  public int getpCnt() {
-    return pCnt;
-  }
-
-  public void setpCnt(int pCnt) {
-    this.pCnt = pCnt;
-  }
-
-  public double getAcPnt() {
-    return acPnt;
-  }
-
-  public void setAcPnt(double acPnt) {
-    this.acPnt = acPnt;
-  }
-
-  public double getAcgPnt() {
-    return acgPnt;
-  }
-
-  public void setAcgPnt(double acgPnt) {
-    this.acgPnt = acgPnt;
-  }
-
   public int getAcCnt() {
     return acCnt;
   }
@@ -114,5 +94,53 @@ public class Problem {
 
   public void setTestCnt(int testCnt) {
     this.testCnt = testCnt;
+  }
+
+  public List<String> getTags() {
+    return Tags;
+  }
+
+  public void setTags(List<String> tags) {
+    Tags = tags;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public int getTimeLimit() {
+    return timeLimit;
+  }
+
+  public void setTimeLimit(int timeLimit) {
+    this.timeLimit = timeLimit;
+  }
+
+  public int getMemoryLimit() {
+    return memoryLimit;
+  }
+
+  public void setMemoryLimit(int memoryLimit) {
+    this.memoryLimit = memoryLimit;
+  }
+
+  public double getBitErrorLimit() {
+    return bitErrorLimit;
+  }
+
+  public void setBitErrorLimit(double bitErrorLimit) {
+    this.bitErrorLimit = bitErrorLimit;
+  }
+
+  public double getQualityLimit() {
+    return qualityLimit;
+  }
+
+  public void setQualityLimit(double qualityLimit) {
+    this.qualityLimit = qualityLimit;
   }
 }

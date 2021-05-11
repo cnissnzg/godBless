@@ -5,7 +5,7 @@ const prefix = '';
 const adminprefix = prefix+'/admin';
 const Url = {
 
-
+  resource : 'http://39.105.21.114:11451/',
   homepage: prefix+'/',
   login: prefix+'/login',
   quickvisit: prefix+'/quickvisit',
@@ -84,6 +84,10 @@ const Url = {
       edit: blogid => adminprefix+'/editblog/'+blogid,
       list: adminprefix+'/blog',
     }
+  },
+
+  code:{
+    editor:prefix+'/editor',
   },
 
 };

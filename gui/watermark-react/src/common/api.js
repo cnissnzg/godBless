@@ -14,6 +14,11 @@ const Api = {
   },
   problem : {
     list: (start,end,admin=false) => host + '/problem/get?start='+start+"&end="+end+"&admin="+admin,
+    getOne: (pid) => host + '/problem/getOne?pid='+pid,
+    getMaterial: (pid) => host + '/problem/getMaterial?pid='+pid,
+    getChallenge: (pid) => host + '/problem/getChallenge?pid='+pid,
+
+
     count: host + '/api/v1/problem/count/',
     detail: pid => host + '/api/v1/problem/detail/?pid='+pid,
     info: pid => host + '/api/v1/problem/info/?pid='+pid,

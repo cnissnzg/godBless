@@ -14,8 +14,24 @@ import java.util.*;
 public class ProblemController {
   @Autowired
   private ProblemService problemService;
+  @Autowired
+  private ChallengeService challengeService;
+  @Autowired
+  private MaterialService materialService;
   @RequestMapping("get")
   public ProblemList getAllPosts(@RequestParam("start")int start, @RequestParam("end")int end){
     return problemService.getProblemList(start, end-start);
+  }
+  @RequestMapping("getOne")
+  public Problem getProblem(@RequestParam("pid") int pid){
+    return problemService.getProblem(pid);
+  }
+  @RequestMapping("getChallenge")
+  public List<Challenge> getChallenge(@RequestParam("pid")int pid){
+    return challengeService.getProblemChallenge(pid);
+  }
+  @RequestMapping("getMaterial")
+  public List<Material> getMaterial(@RequestParam("pid")int pid){
+    return materialService.getProblemMaterial(pid);
   }
 }

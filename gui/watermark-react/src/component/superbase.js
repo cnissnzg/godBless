@@ -30,7 +30,7 @@ class LoginToggle extends React.Component {
   render(){
     if(!showUserName()){
       return(
-        <div class="login">
+        <div className="login">
           <Link to={Url.login}>
         <Button type="primary" shape="round" className="login-but">登录</Button>
         </Link>
@@ -41,7 +41,7 @@ class LoginToggle extends React.Component {
       );
     }else{
       return(
-        <div class="testTest">
+        <div className="testTest">
           <Link to={Url.homepage}>
           <img className="avatar" src={require('../img/avatar/' + '0' + '.jpg').default}/>
           <Text style={{color:"white",fontSize:14,verticalAlign:"middle"}}>{localStorage.getItem("username")}</Text>
@@ -59,19 +59,19 @@ class SuperBase extends React.Component {
       <Layout className="layout">
         <Header className="header">
           <Row>
-            <Col span={20}>
+            <Col span={22}>
           <img className="logo" src={imgUrl}/>
           <Text className="title">Watermark Testing Platform</Text>
           <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[this.props.chosen]}>
             <Menu.Item key="1"><Link to={Url.homepage}>主页</Link></Menu.Item>
-            <Menu.Item key="2">提交代码</Menu.Item>
+            <Menu.Item key="2"><Link to={Url.code.editor}>提交代码</Link></Menu.Item>
             <Menu.Item key="3">宏编辑器</Menu.Item>
             <Menu.Item key="4"><Link to={Url.problem.list}>申请测试</Link></Menu.Item>
             <Menu.Item key="5">测试集</Menu.Item>
             <Menu.Item key="6">评价平台</Menu.Item>
           </Menu>
           </Col>
-          <Col span={4}>
+          <Col span={2}>
           <LoginToggle/>
           </Col>
           </Row>
