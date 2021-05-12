@@ -4,8 +4,11 @@ import Base from '../superbase'
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Api, Url } from '../../common/common';
-import { Row, Col, Menu, Dropdown, Layout, Card, Button, Form, message, Input } from 'antd';
+import { Row, Col, Menu, Dropdown, Layout, Card, Button, Form, message, Input,Drawer } from 'antd';
 import getIcon from '../../common/myIcon';
+import EnvEditor from './envEditor';
+import OptEditor from './optEditor';
+import DepEditor from './depEditor';
 import Icon from '@ant-design/icons';
 import '../../css/base.css';
 import { ReactCodeJar, useCodeJar } from "react-codejar";
@@ -70,11 +73,11 @@ const getPrism = (type) => {
     console.log(type);
     switch (type) {
         case "cpp":
-        case "h":
         case "hpp":
         case "cc":
             return Prism.languages.cpp;
         case "c":
+        case "h":
             return Prism.languages.c;
         case "sh":
             return Prism.languages.bash;
@@ -170,7 +173,7 @@ class ControlPanel extends React.Component {
         var ret = this.tryAddFile(files, path, 0, file);
         if (ret.res == 0) {
             this.props.setFiles(ret.obj);
-            this.props.setPanel('');
+            this.props.setPanel('submit');
             message.success('创建文件成功');
         }
     };
@@ -187,7 +190,7 @@ class ControlPanel extends React.Component {
         } else {
             for (var i = 0; i < structure.length; i++) {
                 if (structure[i].type == 'dir' && structure[i].name == path[dep + 1]) {
-                    var ret = this.tryAddFile(structure[i].children, path, dep + 1, file);
+                    var ret = this.tryRmFile(structure[i].children, path, dep + 1, file);
                     if (ret.res == -1) {
                         return { res: -1 };
                     } else {
@@ -215,7 +218,7 @@ class ControlPanel extends React.Component {
         var ret = this.tryRmFile(files, path, 0, file);
         if (ret.res == 0) {
             this.props.setFiles(ret.obj);
-            this.props.setPanel('');
+            this.props.setPanel('submit');
             message.success('删除文件成功');
         }
     }
@@ -265,7 +268,7 @@ class ControlPanel extends React.Component {
         var ret = this.tryAddDir(files, path, 0, file);
         if (ret.res == 0) {
             this.props.setFiles(ret.obj);
-            this.props.setPanel('');
+            this.props.setPanel('submit');
             message.success('创建文件夹成功');
         }
     };
@@ -308,7 +311,7 @@ class ControlPanel extends React.Component {
         var ret = this.tryRmDir(files, path, 0, file);
         if (ret.res == 0) {
             this.props.setFiles(ret.obj);
-            this.props.setPanel('');
+            this.props.setPanel('submit');
             message.success('删除文件成功');
         }
     }
@@ -319,7 +322,8 @@ class ControlPanel extends React.Component {
                 <Card title="Submit" className="contentContainer">
                     <Row>
                         <Col span={3} offset={8}>
-                            <Button style={{ width: "100%" }}>查看配置信息</Button>
+                            <Button style={{ width: "100%" }}
+                            onClick={()=>{this.props.setDrawer(true)}}>查看配置信息</Button>
                         </Col>
                         <Col span={3} offset={2}>
                             <Button type="primary" style={{ width: "100%" }}>提交编译</Button>
@@ -360,6 +364,24 @@ class ControlPanel extends React.Component {
 
                 </Card>
             );
+        } else if (this.props.panel == 'env') {
+            return (
+                <Card title="Enviroments" className="contentContainer">
+                    <EnvEditor dataSource={this.props.env} upd={this.props.setEnv} />
+                </Card>
+            );
+        } else if (this.props.panel == 'opt') {
+            return (
+                <Card title="Options" className="contentContainer">
+                    <OptEditor dataSource={this.props.opt} upd={this.props.setOpt} />
+                </Card>
+            );
+        } else if (this.props.panel == 'dep') {
+            return (
+                <Card title="Dependencies" className="contentContainer">
+                    <DepEditor dataSource={this.props.dep} upd={this.props.setDep} />
+                </Card>
+            );
         }
     }
 }
@@ -388,7 +410,18 @@ const CodeEditor = () => {
     const [fileNow, setFileNow] = useState('/main.py');
     const [panel, setPanel] = useState('submit');
     const [clipboard, setClipboard] = useState('');
+    const [env, setEnv] = useState([]);
+    const [opt, setOpt] = useState([]);
+    const [dep, setDep] = useState([]);
+    const [visible, setVisible] = useState(false);
 
+    const showDrawer = () => {
+        setVisible(true);
+    };
+
+    const closeDrawer = () => {
+        setVisible(false);
+    };
     const cut = (e) => {
         setClipboard(code);
         setCode('');
@@ -432,13 +465,13 @@ const CodeEditor = () => {
     );
     const vmMenu = (
         <Menu theme="dark" mode="horizontal" >
-            <Menu.Item key="env" >
+            <Menu.Item key="env" onClick={(e) => { setPanel('env'); }}>
                 环境变量
         </Menu.Item>
-            <Menu.Item key="opt">
+            <Menu.Item key="opt" onClick={(e) => { setPanel('opt'); }}>
                 编译选项
         </Menu.Item>
-            <Menu.Item key="dep">
+            <Menu.Item key="dep" onClick={(e) => { setPanel('dep'); }}>
                 库依赖
         </Menu.Item>
         </Menu>
@@ -461,62 +494,102 @@ const CodeEditor = () => {
         console.log(tmp);
     }
     return (
-        <Base menu="normal" chosen="2">
-            <div>
+        <div>
+            <Base menu="normal" chosen="2">
+                <div>
 
-                <Layout style={{ backgroundColor: "black" }}>
-                    <Row style={{ paddingBottom: "0px", marginBottom: "0px" }}>
-                        <Col span={2} className="codePanel">
-                            <Dropdown overlay={fileMenu} trigger={['click']}>
-                                <a style={{ color: "white" }}>
-                                    文件(F)
+                    <Layout style={{ backgroundColor: "black" }}>
+                        <Row style={{ paddingBottom: "0px", marginBottom: "0px" }}>
+                            <Col span={2} className="codePanel">
+                                <Dropdown overlay={fileMenu} trigger={['click']}>
+                                    <a style={{ color: "white" }}>
+                                        文件(F)
                             </a>
-                            </Dropdown>
-                        </Col>
-                        <Col span={2} className="codePanel">
-                            <Dropdown overlay={editMenu} trigger={['click']}>
-                                <a style={{ color: "white" }}>
-                                    编辑(E)
+                                </Dropdown>
+                            </Col>
+                            <Col span={2} className="codePanel">
+                                <Dropdown overlay={editMenu} trigger={['click']}>
+                                    <a style={{ color: "white" }}>
+                                        编辑(E)
                         </a>
-                            </Dropdown>
-                        </Col>
-                        <Col span={2} className="codePanel">
-                            <Dropdown overlay={vmMenu} trigger={['click']}>
-                                <a style={{ color: "white" }}>
-                                    配置(O)
+                                </Dropdown>
+                            </Col>
+                            <Col span={2} className="codePanel">
+                                <Dropdown overlay={vmMenu} trigger={['click']}>
+                                    <a style={{ color: "white" }}>
+                                        配置(O)
                             </a>
-                            </Dropdown>
-                        </Col>
-                        <Col span={2} className="codePanel">
-                            <Dropdown overlay={compileMenu} trigger={['click']}>
-                                <a style={{ color: "white" }}>
-                                    编译(C)
+                                </Dropdown>
+                            </Col>
+                            <Col span={2} className="codePanel">
+                                <Dropdown overlay={compileMenu} trigger={['click']}>
+                                    <a style={{ color: "white" }}>
+                                        编译(C)
                             </a>
-                            </Dropdown>
-                        </Col>
-                    </Row>
+                                </Dropdown>
+                            </Col>
+                        </Row>
 
-                    <Row style={{ paddingTop: "0px", marginTop: "0px" }}>
-                        <Col span={4}>
-                            <Menu theme="dark" mode="inline" style={{ height: "340px", overflowY: "auto", borderBottomLeftRadius: "6px", borderTopLeftRadius: "6px" }}
-                                onSelect={handleSelect}
-                                defaultSelectedKeys={['/main.py']}>
-                                {files.map(child => getMenuItem(child, ''))}
-                            </Menu>
-                        </Col>
-                        <Col span={20}>
-                            {searchType(files, fileNow) == 'cpp' ? (<div class="editor"><LangBug lang={'cpp'} code={code} setCode={setCode} /></div>) : null}
-                            {searchType(files, fileNow) == 'py' ? (<div class="editor"><LangBug lang={'py'} code={code} setCode={setCode} /></div>) : null}
+                        <Row style={{ paddingTop: "0px", marginTop: "0px" }}>
+                            <Col span={4}>
+                                <Menu theme="dark" mode="inline" style={{ height: "340px", overflowY: "auto", borderBottomLeftRadius: "6px", borderTopLeftRadius: "6px" }}
+                                    onSelect={handleSelect}
+                                    defaultSelectedKeys={['/main.py']}>
+                                    {files.map(child => getMenuItem(child, ''))}
+                                </Menu>
+                            </Col>
+                            <Col span={20}>
+                                {searchType(files, fileNow) == 'cpp' || searchType(files, fileNow) == 'cc' || searchType(files, fileNow) == 'hpp' ? (<div class="editor"><LangBug lang={'cpp'} code={code} setCode={setCode} /></div>) : null}
+                                {searchType(files, fileNow) == 'c' || searchType(files, fileNow) == 'h' ? (<div class="editor"><LangBug lang={'c'} code={code} setCode={setCode} /></div>) : null}
+                                {searchType(files, fileNow) == 'py' ? (<div class="editor"><LangBug lang={'py'} code={code} setCode={setCode} /></div>) : null}
+                                {searchType(files, fileNow) == 'sh' ? (<div class="editor"><LangBug lang={'sh'} code={code} setCode={setCode} /></div>) : null}
+                                {searchType(files, fileNow) == 'md' ? (<div class="editor"><LangBug lang={'md'} code={code} setCode={setCode} /></div>) : null}
+                                {getPrism(searchType(files, fileNow)) == Prism.languages.makefile ? (<div class="editor"><LangBug lang={'txt'} code={code} setCode={setCode} /></div>) : null}
 
 
-                        </Col>
-                    </Row>
-                </Layout>
-                <Layout>
-                    <ControlPanel panel={panel} files={files} setFiles={setFiles} setPanel={setPanel} />
-                </Layout>
-            </div>
-        </Base>
+                            </Col>
+                        </Row>
+                    </Layout>
+                    <Layout>
+                        <ControlPanel panel={panel} files={files} setFiles={setFiles} setPanel={setPanel}
+                            env={env} opt={opt} dep={dep} setEnv={setEnv} setDep={setDep} setOpt={setOpt}
+                            setDrawer={setVisible} />
+                    </Layout>
+                </div>
+            </Base>
+            <Drawer
+                title="配置数据"
+                placement="right"
+                closable={false}
+                onClose={closeDrawer}
+                visible={visible}
+            >
+                    <h4>环境变量:</h4>
+                <p>
+                    {env.map(child=>(<Row style={{fontSize:"8px"}}>
+                        <Col span={10} style={{fontWeight:"bold"}}>{child.name}:</Col>
+                        <Col span={14}>{child.value}</Col>
+                    </Row>))
+                    }
+                </p>
+                <h4>编译选项:</h4>
+                <p>
+                    {opt.map(child=>(<Row style={{fontSize:"8px"}}>
+                        <Col span={10} style={{fontWeight:"bold"}}>{child.name}:</Col>
+                        <Col span={14}>{child.value}</Col>
+                    </Row>))
+                    }
+                </p>
+                <h4>库依赖:</h4>
+                <p>
+                    {dep.map(child=>(<Row style={{fontSize:"8px"}}>
+                        <Col span={10} style={{fontWeight:"bold"}}>{child.name}:</Col>
+                        <Col span={14}>{child.value}</Col>
+                    </Row>))
+                    }
+                </p>
+            </Drawer>
+        </div>
     );
 };
 export default CodeEditor;
