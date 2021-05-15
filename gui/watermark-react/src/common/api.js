@@ -91,6 +91,10 @@ const Api = {
     get: blogid => host + '/api/v1/blog/get/?blogid='+blogid,
     list: host + '/api/v1/blog/list/',
     edit: host + '/api/v1/blog/edit/',
+  },
+
+  code : {
+    submit: host + '/algorithm/submit',
   }
 };
 

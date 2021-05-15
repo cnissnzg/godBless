@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { render } from 'react-dom';
 import { Layout, Menu,Typography, Button,Row, Col } from 'antd';
 import imgUrl from "../img/logo2.jpeg"
+import axios from 'axios';
 import 'antd/dist/antd.css';
 import './superbase.css';
 import { Link } from 'react-router-dom';
@@ -28,6 +29,9 @@ const showUserName = ()=>{
 class LoginToggle extends React.Component {
 
   render(){
+    axios.defaults.headers.common['Authorization'] =
+    localStorage.getItem('hojxtoken') === null ? '' : localStorage.getItem('hojxtoken');
+    
     if(!showUserName()){
       return(
         <div className="login">
@@ -64,7 +68,7 @@ class SuperBase extends React.Component {
           <Text className="title">Watermark Testing Platform</Text>
           <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[this.props.chosen]}>
             <Menu.Item key="1"><Link to={Url.homepage}>主页</Link></Menu.Item>
-            <Menu.Item key="2"><Link to={Url.code.editor}>提交代码</Link></Menu.Item>
+            <Menu.Item key="2"><Link to={Url.code.updateCode}>提交代码</Link></Menu.Item>
             <Menu.Item key="3">宏编辑器</Menu.Item>
             <Menu.Item key="4"><Link to={Url.problem.list}>申请测试</Link></Menu.Item>
             <Menu.Item key="5">测试集</Menu.Item>

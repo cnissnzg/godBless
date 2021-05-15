@@ -68,7 +68,14 @@ const getMenuItem = (item, path) => {
         );
     }
 }
-
+function isInArray(arr,value){
+    for(var i = 0; i < arr.length; i++){
+        if(value === arr[i]){
+            return true;
+        }
+    }
+    return false;
+}
 const getPrism = (type) => {
     console.log(type);
     switch (type) {
@@ -315,8 +322,54 @@ class ControlPanel extends React.Component {
             message.success('删除文件成功');
         }
     }
+    getAllFileName =(files,path)=>{
+        let res = [];
+        for(var i = 0;i < files.length;i++){
+            if(files[i].type=='dir'){
+                res = res.concat(this.getAllFileName(files[i].children,path+'/'+files[i].name));
+            }else{
+                res.push(path+'/'+files[i].name);
+            }
+        }
+        return res;
+    }
+    toSubmit = ()=>{
+        this.props.saveNow();
+        let fl = this.getAllFileName(this.state.files,'');
+        let tmp = this.props.savedCode;
+        for(var key in tmp){
+            if(!isInArray(fl,key)){
+                delete tmp[key];
+            }
+        }
+        var res={
+            name:localStorage.getItem('algorithm'),
+            code:tmp,
+            env:this.props.env,
+            opt:this.props.opt,
+            dep:this.props.dep,
+            fileTree:{name:'',type:'dir',children:this.state.files},
+        }
+        console.log('to submit')
+        console.log(res)
+        
+        message.destroy();
+        message.loading('提交中...',0);
+        axios.post(Api.code.submit,res).then((response) => {
+          if(response.status !== 200){
+            message.destroy();
+            message.error("提交失败")
+          }else{
+            message.destroy();
+            message.success("提交成功");
+          }
+        }).catch((error) => {
+          console.log(error)
+          message.destroy();
+          message.error("提交失败")
+        });
+    }
     render() {
-        console.log(this.props.panel);
         if (this.props.panel == 'submit') {
             return (
                 <Card title="Submit" className="contentContainer">
@@ -326,7 +379,8 @@ class ControlPanel extends React.Component {
                             onClick={()=>{this.props.setDrawer(true)}}>查看配置信息</Button>
                         </Col>
                         <Col span={3} offset={2}>
-                            <Button type="primary" style={{ width: "100%" }}>提交编译</Button>
+                            <Button type="primary" style={{ width: "100%" }}
+                            onClick={this.toSubmit}>提交编译</Button>
                         </Col>
                     </Row>
 
@@ -493,11 +547,15 @@ const CodeEditor = () => {
         setCode(tmp[e.key] ? tmp[e.key] : '');
         console.log(tmp);
     }
+    const saveNow = () =>{
+        let tmp = savedCode;
+        tmp[fileNow] = code;
+        saveCode(tmp);
+    }
     return (
         <div>
             <Base menu="normal" chosen="2">
                 <div>
-
                     <Layout style={{ backgroundColor: "black" }}>
                         <Row style={{ paddingBottom: "0px", marginBottom: "0px" }}>
                             <Col span={2} className="codePanel">
@@ -553,7 +611,7 @@ const CodeEditor = () => {
                     <Layout>
                         <ControlPanel panel={panel} files={files} setFiles={setFiles} setPanel={setPanel}
                             env={env} opt={opt} dep={dep} setEnv={setEnv} setDep={setDep} setOpt={setOpt}
-                            setDrawer={setVisible} />
+                            setDrawer={setVisible} savedCode={savedCode} saveNow={saveNow}/>
                     </Layout>
                 </div>
             </Base>

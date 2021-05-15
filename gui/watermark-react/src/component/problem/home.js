@@ -1,7 +1,7 @@
 import React from 'react';
 import Base from '../superbase';
 import { Table, Menu, Dropdown, Divider, Breadcrumb, Tooltip, Input, Tag, Row, Col} from 'antd';
-import axios from '../../common/myAxios';
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Api, Url } from '../../common/common';
 import '../../css/base.css';
