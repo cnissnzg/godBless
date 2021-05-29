@@ -1,8 +1,10 @@
 package com.watermark.controller;
 
+import com.example.controller.*;
 import com.example.util.*;
 import com.watermark.config.*;
 import com.watermark.entity.*;
+import com.watermark.service.*;
 import com.watermark.utils.*;
 import org.apache.ibatis.annotations.*;
 import org.apache.rocketmq.client.exception.*;
@@ -17,6 +19,8 @@ import org.apache.commons.io.FileUtils;
 
 import javax.servlet.http.*;
 import java.io.*;
+import java.nio.charset.*;
+import java.nio.file.*;
 import java.util.*;
 
 @RestController
@@ -28,6 +32,34 @@ public class AlgorithmController {
   private HttpServletRequest request;
   @Autowired
   DefaultMQProducer defaultMQProducer;
+  @Autowired
+  AlgorithmService algorithmService;
+
+  @Autowired
+  private NonStaticResourceHttpRequestHandler nonStaticResourceHttpRequestHandler;
+
+  @GetMapping("/getFile")
+  public void getFile(HttpServletRequest request, HttpServletResponse response,@RequestParam("name")String name,@RequestParam("uid")String uid) throws Exception {
+
+    String sourcePath = myConfig.getRoot();
+    String realPath = sourcePath+"/" +name+"@"+uid+".tar.gz";
+
+    System.out.println(realPath);
+    Path filePath = Paths.get(realPath);
+    System.out.println(Files.exists(filePath));
+    if (Files.exists(filePath)) {
+      int i = 1;//fuck idea
+      String mimeType = Files.probeContentType(filePath);
+      if (!StringUtils.isEmpty(mimeType)) {
+        response.setContentType(mimeType);
+      }
+      request.setAttribute(NonStaticResourceHttpRequestHandler.ATTR_FILE, filePath);
+      nonStaticResourceHttpRequestHandler.handleRequest(request, response);
+    } else {
+      response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
+    }
+  }
 
   private void createDirs(FileTree fileTree,String dirname) throws Exception{
     for(FileTree tmp:fileTree.getChildren()){
@@ -55,23 +87,38 @@ public class AlgorithmController {
     }
     CompressHelper.dirTarGzip(dirname,dirname+".tar.gz");
 
-
+    if(algorithmService.check(JwtTokenUtils.getUsername(token),algorithm.getName()) == 0){
+      algorithmService.addAlgorithm(algorithm);
+    }
     return ResponseEntity.ok().build();
   }
 
-  /**
-   * 发送简单的MQ消息
-   * @param msg
-   * @return
-   */
-  @GetMapping("/send")
-  public String send(String msg) throws InterruptedException, RemotingException, MQClientException, MQBrokerException {
-    if (StringUtils.isEmpty(msg)) {
-      return "200";
+  @RequestMapping(value = "check",method = RequestMethod.GET)
+  public ResponseEntity<Integer> submit(@RequestParam("uid") String uid,@RequestParam("name") String name){
+    if(algorithmService.check(uid, name) > 0){
+      return ResponseEntity.badRequest().build();
+    }else{
+      return ResponseEntity.ok().build();
     }
-    Message sendMsg = new Message("TestTopic", "TestTag", msg.getBytes());
-    // 默认3秒超时
-    SendResult sendResult = defaultMQProducer.send(sendMsg);
-    return sendResult.toString();
+
   }
+
+  @RequestMapping(value = "add",method = RequestMethod.POST)
+  public int addAlgorithm(@RequestBody Algorithm algorithm){
+    return algorithmService.addAlgorithm(algorithm);
+  }
+  @RequestMapping(value = "getAll",method = RequestMethod.GET)
+  public CommonList getAlgorithmList(@RequestParam("start") int start,@RequestParam("end") int end){
+    return algorithmService.getAlgorithmList(start,end-start);
+  }
+  @RequestMapping(value = "getUserAll",method = RequestMethod.GET)
+  public CommonList getAlgorithmListByUid(@RequestParam("start") int start,@RequestParam("end") int end,@RequestParam("uid") String uid){
+    return algorithmService.getAlgorithmListByUid(start, end-start, uid);
+  }
+  @RequestMapping(value = "del",method = RequestMethod.GET)
+  public int delAlgorithm(@RequestParam("algorithmId") String algorithmId){
+    return algorithmService.delAlgorithm(algorithmId);
+  }
+
+
 }

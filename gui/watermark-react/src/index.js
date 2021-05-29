@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+//import { HashRouter as Router, Switch, Route} from 'react-router-dom';
 import { BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 import {Url} from './common/common';
 import Home from './home';
@@ -11,6 +12,8 @@ import Register from './component/user/register';
 import Login from './component/login';
 import CodeEitor from './component/code/editor';
 import UpdateCode from './component/code/updateCode';
+import CodeList from './component/code/codeList';
+import MyCodeList from './component/code/myCodeList';
 ReactDOM.render((
   <Router>
     <Switch>
@@ -21,7 +24,9 @@ ReactDOM.render((
       <Route exact path={Url.user.register} component={Register} />
       <Route exact path={Url.login} component={Login} />
       <Route exact path={Url.code.editor(":algorithm")} component={CodeEitor} />
-      <Route path={Url.problem.UpdateCode } component={UpdateCode} />
+      <Route path={Url.code.updateCode } component={UpdateCode} />
+      <Route path={Url.code.codeList} component={CodeList} />
+      <Route path={Url.code.myCodeList} component={MyCodeList} />
     </Switch>
   </Router>
 ),

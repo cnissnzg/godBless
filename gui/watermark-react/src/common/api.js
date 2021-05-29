@@ -2,9 +2,10 @@
 api接口配置
  */
 //本地打包
-//const host = 'http://localhost:12306/watermark';
+//const host = 'http://localhost:12306/api/v1/watermark';
 //浏览器
 const host = '/api/v1/watermark';
+const whole = 'http://localhost:12306/api/v1/watermark';
 const Api = {
   login: host + '/user/login',
 
@@ -95,6 +96,10 @@ const Api = {
 
   code : {
     submit: host + '/algorithm/submit',
+    list: (start,end) => host + '/algorithm/getAll?start='+start+"&end="+end,
+    myList: (start,end,uid) => host + '/algorithm/getAll?start='+start+"&end="+end+"&uid"+uid,
+    del : algorithmId => host + '/algorithm/del?algorithmId='+algorithmId,
+    getFile: (name,uid) =>  whole + '/algorithm/getFile?name='+name+"&uid="+uid,
   }
 };
 

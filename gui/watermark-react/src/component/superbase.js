@@ -57,25 +57,37 @@ class LoginToggle extends React.Component {
   }
 }
 class SuperBase extends React.Component {
-
+  handleClick = e => {
+    console.log('click ', e);
+  };
   render() {
     return (
       <Layout className="layout">
         <Header className="header">
           <Row>
-            <Col span={22}>
+            <Col span={2}>
           <img className="logo" src={imgUrl}/>
-          <Text className="title">Watermark Testing Platform</Text>
-          <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[this.props.chosen]}>
+          </Col>
+          <Col span={3}>
+          <Text className="title">水印测评平台</Text>
+          </Col>
+          <Col span={13}>
+          <Menu theme="dark" mode="horizontal" onClick={this.handleClick}>
             <Menu.Item key="1"><Link to={Url.homepage}>主页</Link></Menu.Item>
-            <Menu.Item key="2"><Link to={Url.code.updateCode}>提交代码</Link></Menu.Item>
-            <Menu.Item key="3">宏编辑器</Menu.Item>
-            <Menu.Item key="4"><Link to={Url.problem.list}>申请测试</Link></Menu.Item>
-            <Menu.Item key="5">测试集</Menu.Item>
+            <SubMenu title="代码" key="2" popupOffset={[-50,-5]}>
+              <Menu.Item>
+                <Link to={Url.code.updateCode}>创建代码</Link>
+              </Menu.Item>
+              <Menu.Item><Link to={Url.code.myCodeList}>我的代码</Link></Menu.Item>
+              <Menu.Item><Link to={Url.code.codeList}>开源算法代码</Link></Menu.Item>
+            </SubMenu>
+            <Menu.Item key="3">素材库</Menu.Item>
+            <Menu.Item key="4"><Link to={Url.problem.list}>测试集</Link></Menu.Item>
+            <Menu.Item key="5">脚本宏</Menu.Item>
             <Menu.Item key="6">评价平台</Menu.Item>
           </Menu>
           </Col>
-          <Col span={2}>
+          <Col offset={3} span={3}>
           <LoginToggle/>
           </Col>
           </Row>

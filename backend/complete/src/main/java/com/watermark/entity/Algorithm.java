@@ -3,6 +3,8 @@ package com.watermark.entity;
 import java.util.*;
 
 public class Algorithm {
+  private String algorithmId;
+  private String uid;
   private String name;
   private HashMap<String,String> code;
   private FileTree fileTree;
@@ -69,6 +71,22 @@ public class Algorithm {
 
   public void setDep(List<KV> dep) {
     this.dep = dep;
+  }
+
+  public String getAlgorithmId() {
+    return algorithmId;
+  }
+
+  public void setAlgorithmId(String algorithmId) {
+    this.algorithmId = algorithmId;
+  }
+
+  public String getUid() {
+    return uid;
+  }
+
+  public void setUid(String uid) {
+    this.uid = uid;
   }
 
   @Override

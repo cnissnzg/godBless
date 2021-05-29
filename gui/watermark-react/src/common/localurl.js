@@ -87,8 +87,10 @@ const Url = {
   },
 
   code:{
-    editor:algorithm => prefix+'/editor/edit/'+algorithm,
+    editor : algorithm => prefix+'/editor/edit/'+algorithm,
     updateCode: prefix+'/editor/updateCode',
+    codeList : prefix+'/editor/codeList',
+    myCodeList : prefix+'/editor/myCodeList',
   },
 
 };

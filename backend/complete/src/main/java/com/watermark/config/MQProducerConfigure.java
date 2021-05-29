@@ -42,7 +42,7 @@ public class MQProducerConfigure {
    */
   @Bean
   public DefaultMQProducer defaultProducer() throws MQClientException {
-    LOGGER.info("defaultProducer 正在创建---------------------------------------");
+    LOGGER.info("RocketMq Producer Building");
     DefaultMQProducer producer = new DefaultMQProducer(groupName);
     producer.setNamesrvAddr(namesrvAddr);
     producer.setVipChannelEnabled(false);
@@ -50,7 +50,8 @@ public class MQProducerConfigure {
     producer.setSendMsgTimeout(sendMsgTimeOut);
     producer.setRetryTimesWhenSendAsyncFailed(retryTimesWhenSendFailed);
     producer.start();
-    LOGGER.info("rocketmq producer server 开启成功----------------------------------");
+    LOGGER.info("RocketMq Producer Build Success");
     return producer;
   }
+
 }
