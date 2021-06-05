@@ -89,6 +89,9 @@ public class Algorithm {
     this.uid = uid;
   }
 
+  public String getFileName(){
+    return name+"@"+uid+".tar.gz";
+  }
   @Override
   public String toString() {
     return "Algorithm{" +

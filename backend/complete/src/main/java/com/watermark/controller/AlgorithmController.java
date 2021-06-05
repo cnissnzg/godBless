@@ -103,6 +103,12 @@ public class AlgorithmController {
 
   }
 
+  @RequestMapping(value = "test",method = RequestMethod.GET)
+  public int test(@RequestParam("name") String name){
+    OSSHandler.uploadCode(myConfig.getRoot(),name);
+    return 0;
+  }
+
   @RequestMapping(value = "add",method = RequestMethod.POST)
   public int addAlgorithm(@RequestBody Algorithm algorithm){
     return algorithmService.addAlgorithm(algorithm);

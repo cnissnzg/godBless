@@ -6,7 +6,7 @@ import { Layout } from 'antd';
 import axios from 'axios';
 import { Api,Url } from '../common/common';
 import { Redirect,Link } from 'react-router-dom';
-
+import {UserOutlined,SafetyOutlinedSvg,LockOutlined, SafetyOutlined} from '@ant-design/icons';
 const { Content, Footer } = Layout;
 
 const FormItem = Form.Item;
@@ -39,7 +39,7 @@ class LoginForm extends React.Component {
       title: '找回密码',
       content: (
         <div>
-          <p>请用账户的注册邮箱发送邮件到hitonlinejudge@163.com，并提供用户名，我们会尽快处理</p>
+          <p>联系我，email：984753891@qq.com</p>
         </div>
       ),
       onOk() {},
@@ -88,20 +88,20 @@ class LoginForm extends React.Component {
         <FormItem
         name = 'userName'
         rules={[{ required: true, message: 'Please input your username!' }]}>
-            <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
+            <Input prefix={<UserOutlined style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
         </FormItem>
         <FormItem
           name='password'
           rules={[{ required: true, message: 'Please input your password!' }]}>
 
-            <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
+            <Input prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
         </FormItem>
         <FormItem>
         <FormItem
          style={{width:'50%',float:'left'}}
         name='captcha'
             rules={[{ required: true, message: 'Please input captcha!' }]}>
-            <Input prefix={<Icon type="safety" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Captcha"/>
+            <Input prefix={<SafetyOutlined type="safety" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Captcha"/>
 
 
         

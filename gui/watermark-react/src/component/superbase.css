@@ -1,7 +1,5 @@
  .logo {
-    height: 60px;
-    width: 60px;
-    margin: 2px;
+    height: 65px;
     float: left;
     background: rgba(255, 255, 255, 0.3);
   }
@@ -56,5 +54,9 @@
     width: 100%;
   }
   .login-form-forgot {
+    float: right;
+  }
+
+  .testTest{
     float: right;
   }

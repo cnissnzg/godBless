@@ -16,6 +16,8 @@ const Url = {
     list: prefix+'/testset',
     detail: pid => prefix+"/testset/"+pid,
     submit: pid => prefix+"/testset/submit/"+pid,
+    add: prefix+'/testsetAdd/',
+
     discuss: pid => prefix+"/problemset/"+pid+"/discuss",
     statistic: pid => prefix+"/problemset/"+pid+"/statistic",
 
@@ -28,7 +30,7 @@ const Url = {
   },
 
   judge:{
-    status: prefix+'/status',
+    status: prefix+'/judge/status',
   },
 
   user:{
@@ -91,6 +93,9 @@ const Url = {
     updateCode: prefix+'/editor/updateCode',
     codeList : prefix+'/editor/codeList',
     myCodeList : prefix+'/editor/myCodeList',
+  },
+  watch : {
+    random : prefix + '/watch/random',
   },
 
 };

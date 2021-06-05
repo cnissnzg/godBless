@@ -46,10 +46,21 @@ public class JwtTokenUtils {
   }
   // 是否已过期
   public static boolean isExpiration(String token){
-    return getTokenBody(token).getExpiration().before(new Date());
+    Claims claims = getTokenBody(token);
+    Date expiration = claims.getExpiration();
+    return new Date(System.currentTimeMillis()).after(expiration);
   }
 
   private static Claims getTokenBody(String token){
+    Claims claims;
+    try {
+      claims = Jwts.parser()
+              .setSigningKey(SECRET)
+              .parseClaimsJws(token)
+              .getBody();
+    }catch (ExpiredJwtException e){
+      claims = e.getClaims();
+    }
     return Jwts.parser()
             .setSigningKey(SECRET)
             .parseClaimsJws(token)

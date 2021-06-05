@@ -13,6 +13,7 @@
     "axios": "^0.21.1",
     "babel-plugin-import": "^1.13.3",
     "electron": "^12.0.2",
+    "griffith": "^1.13.0",
     "history": "^5.0.0",
     "http-proxy-middleware": "^1.1.0",
     "https-proxy-agent": "^5.0.0",

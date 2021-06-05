@@ -6,6 +6,7 @@ import axios from 'axios';
 import { Api,Url } from '../../common/common';
 import '../../css/base.css';
 import { Redirect } from 'react-router-dom';
+import {UserOutlined,MailOutlined,LockOutlined} from '@ant-design/icons';
 const FormItem = Form.Item;
 const { Content, Footer } = Layout;
 
@@ -66,7 +67,7 @@ class RegisterForm extends React.Component{
           <FormItem 
           name='username'
           rules={[{required: true}]}>
-              <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username"/>
+              <Input prefix={<UserOutlined style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username"/>
           </FormItem>
   
           <FormItem
@@ -77,7 +78,7 @@ class RegisterForm extends React.Component{
                 required: true, message: 'Please input your E-mail!',
               }]}
             >
-              <Input prefix={<Icon type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Email" />
+              <Input prefix={<MailOutlined type="mail" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Email" />
           </FormItem>
           <FormItem
               name = "password"
@@ -85,7 +86,7 @@ class RegisterForm extends React.Component{
                 required: true, message: 'Please input your password!'
               }, 
               {validator: this.validateToNextPassword}]}>
-              <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
+              <Input prefix={<LockOutlined type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
           </FormItem>
           <FormItem
               name = "confirm"
@@ -99,7 +100,7 @@ class RegisterForm extends React.Component{
                   return Promise.reject(new Error('The two passwords that you entered do not match!'));
                 },
               })]}>
-              <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" onBlur={this.handleConfirmBlur} placeholder="Confirm Password" />
+              <Input prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" onBlur={this.handleConfirmBlur} placeholder="Confirm Password" />
           </FormItem>
   
           <FormItem >
