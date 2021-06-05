@@ -14,7 +14,6 @@ compiler::compiler(const problem &problemInfo, logger &logfile) : problemInfo(pr
 
 int compiler::compile()  {
     chdir(WORK_DIR.c_str());
-    chroot(WORK_DIR.c_str());
     int pid = fork();
     if(pid < 0){
         logfile.writeLog("Error fork");
@@ -33,12 +32,10 @@ int compiler::compile()  {
 
         mount();
 
-        freopen("ce2.txt", "w", stderr);
         setId();
         switch (problemInfo.type) {
             case 1:
-                cout<<"cm"<<endl;
-                cout<<execute_cmd("cmake %s/ && make %s/",WORK_DIR.c_str(),WORK_DIR.c_str());
+                cout<<execute_cmd("cmake . >%s 2&>1 && make >%s 2&>1","cmake.log","make.log");
                 break;
             case 2:
                 execl("python", "main.py",(char *) nullptr);
