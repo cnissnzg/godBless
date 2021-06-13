@@ -14,4 +14,7 @@ public class MaterialService {
   public List<Material> getProblemMaterial(int pid){
     return materialMapper.getProblemMaterial(pid);
   }
+  public int add(Material material){
+    return materialMapper.add(material);
+  }
 }

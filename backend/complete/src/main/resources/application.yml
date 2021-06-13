@@ -29,7 +29,7 @@ logging:
     path: /myApp/log
 
 my-path:
-  root: D:/die/fuck/final/backend/complete/output
+  root: /root/watermark/true_code
 
 
 

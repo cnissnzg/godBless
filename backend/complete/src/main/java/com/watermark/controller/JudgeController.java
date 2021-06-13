@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.*;
 import java.nio.charset.*;
 import java.nio.file.*;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/watermark/judge")
@@ -33,8 +34,14 @@ public class JudgeController {
   @Autowired
   DefaultMQPushConsumer defaultMQPushConsumer;
   @GetMapping("/hi")
-  public void sayHi(@RequestParam("runId")String runId){
-    JudgeQueue.stillAlive(runId);
+  public ResponseEntity<String> sayHi(@RequestParam("runId")String runId){
+    System.out.println("hear you baby!"+runId);
+    if(JudgeQueue.stillAlive(runId)){
+      return new ResponseEntity<>("",HttpStatus.OK);
+    }else{
+      return new ResponseEntity<>("404",HttpStatus.BAD_REQUEST);
+    }
+
   }
 
   @GetMapping("/godBless")
@@ -97,5 +104,40 @@ public class JudgeController {
       return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return new ResponseEntity<>(ret,HttpStatus.OK);
+  }
+
+  @GetMapping("/debug")
+  public ResponseEntity<RunJson> debug(@RequestParam("algorithmId") int algorithmId,
+                                           @RequestParam("uid") String uid, @RequestParam("pid") int pid){
+    Judge judge = new Judge();
+    RunJson runJson = new RunJson();
+    try {
+      judge = judgeService._debug(algorithmId,uid,pid,algorithmService.getAlgorithmById(algorithmId).getFileName());
+    }catch (Exception e){
+      return new ResponseEntity<>(runJson, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return new ResponseEntity<>(judgeService.getRunBody(judge),HttpStatus.OK);
+  }
+
+  @GetMapping("/list")
+  public ResponseEntity<List<Map<String,String>>> getList(){
+    List<Judge> res = new ArrayList<>();
+    try {
+      res = judgeService.query();
+    }catch (Exception e){
+      return new ResponseEntity<>(judgeService.tranJudge(res), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return new ResponseEntity<>(judgeService.tranJudge(res),HttpStatus.OK);
+  }
+
+  @GetMapping("/report")
+  public ResponseEntity<String> getReport(@RequestParam("runId") String runId){
+    String res = "";
+    try {
+      res = OSSHandler.load(runId);
+    }catch (Exception e){
+      return new ResponseEntity<>(res, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return new ResponseEntity<>(res, HttpStatus.OK);
   }
 }

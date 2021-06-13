@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Base from '../superbase'
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Redirect,Link } from 'react-router-dom';
 import { Api, Url } from '../../common/common';
 import { Row, Col, Typography, Card, Collapse, Tag, Button, Radio, Input, Form, Upload, message, Modal, Dropdown, Menu, List } from 'antd';
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
@@ -24,37 +24,51 @@ const tailLayout = {
         span: 8,
     },
 };
-
+var files = [];
 class PicturesWall extends React.Component {
     state = {
         previewVisible: false,
         previewImage: '',
         previewTitle: '',
         fileList: [],
+        files:this.props.fileList,
     };
 
     handleCancel = () => this.setState({ previewVisible: false });
 
     handlePreview = async file => {
+        if (file['type'].indexOf('video/') == 0) {
+            var gifFileName = file['name'].split('.')[0] + '.gif';
+            this.setState({
+                previewImage: 'http://39.105.21.114:11451/library/gif/' + gifFileName,
+                previewVisible: true,
+                previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+            });
+        } else {
+            this.setState({
+                previewImage: 'http://39.105.21.114:11451/library/' + file['name'],
+                previewVisible: true,
+                previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+            });
+        }
         console.log(file);
-        this.setState({
-            previewImage: 'http://39.105.21.114:11451/video/1001/gif/2.gif',
-            previewVisible: true,
-            previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
-        });
+
     };
 
     handleChange = ({ fileList }) => {
-        this.setState({ fileList });
+        this.setState({files:fileList})
+        this.setState({ fileList:fileList });
+        files = fileList;
     }
     handleThumbnail = (file) => {
         if (file['type'].indexOf('video/') == 0) {
             return new Promise((resolve) => {
-                resolve('http://39.105.21.114:11451/video/1001/gif/2.gif');
+                var gifFileName = file['name'].split('.')[0] + '.gif';
+                resolve('http://39.105.21.114:11451/library/gif/' + gifFileName);
             })
         } else {
             return new Promise((resolve) => {
-                resolve('http://39.105.21.114:11451/lena.jpg');
+                resolve('http://39.105.21.114:11451/library/' + file['name']);
             })
         }
     }
@@ -68,21 +82,17 @@ class PicturesWall extends React.Component {
         );
         return (
             <>
-                <FormItem
-                    valuePropName='fileList'
-                    rules={[{ required: true, message: "Can't be empty!" }]}
+
+                <Upload
+                    action={Api.problem.uploadMaterial}
+                    listType="picture-card"
+                    fileList={fileList}
+                    onPreview={this.handlePreview}
+                    onChange={this.handleChange}
+                    previewFile={this.handleThumbnail}
                 >
-                    <Upload
-                        action="http://127.0.0.1:12306/api/v1/watermark/problem/upload"
-                        listType="picture-card"
-                        fileList={fileList}
-                        onPreview={this.handlePreview}
-                        onChange={this.handleChange}
-                        previewFile={this.handleThumbnail}
-                    >
-                        {fileList.length >= 8 ? null : uploadButton}
-                    </Upload>
-                </FormItem>
+                    {fileList.length >= 20 ? null : uploadButton}
+                </Upload>
                 <Modal
                     visible={previewVisible}
                     title={previewTitle}
@@ -102,7 +112,14 @@ class ChallengeList extends React.Component {
             { name: 'chop', params: [{ name: 'code', domain: '-' }, { name: 'rate', domain: '-' }] },
             { name: 'cover', params: [{ name: 'height', domain: '(0,)' }, { name: 'width', domain: '(0,)' }] },
         ],
-        data: this.props.data == null ? [] : this.props.data,
+        data: this.props.data,
+    }
+    componentDidMount() {
+        axios.get(Api.problem.getParam).then((response) => {
+            this.setState({
+                meta: response.data,
+            });
+        }).catch((error) => { console.log(error) })
     }
     handleClick = menuItem => {
         var tmp = this.state.data;
@@ -154,7 +171,7 @@ class ChallengeList extends React.Component {
                                                     <Input addonBefore={param.name} onChange={
                                                         e => {
                                                             var tmp = this.state.data;
-                                                            console.log('stf',item.pcid,param.no,tmp);
+                                                            console.log('stf', item.pcid, param.no, tmp);
                                                             tmp[item.pcid].params[param.no].value = e.target.value;
                                                             this.setState({ data: tmp });
                                                         }
@@ -172,15 +189,57 @@ class ChallengeList extends React.Component {
     }
 };
 const FormItem = Form.Item;
+const showUserName = () => {
+    let nowTime = new Date();
+    let deadtime = localStorage.getItem("tokendeadtime");
+    console.log(localStorage.hasOwnProperty("username"));
+    return deadtime != null && nowTime.getTime() < deadtime && localStorage.hasOwnProperty("hojxtoken") && localStorage.hasOwnProperty("username");
+  }
 class AddProblem extends React.Component {
+
+    state = {
+        fileList:[],
+        data:[],
+    }    
+    handleSubmit = (values) => {
+        if(!showUserName()){
+            message.error("请先登录")
+            return;
+        }
+        let uid = localStorage.getItem("username");
+        values['fileList'] = files
+        values['data'] = this.state.data
+        values['uid'] = uid
+        message.destroy();
+        message.loading('提交中...',0);
+        axios.post(Api.problem.add,values).then((response) => {
+          if(response.status !== 200){
+            message.destroy();
+            message.error("添加失败")
+          }else{
+            message.destroy();
+            message.success("添加成功");
+            this.setState({
+                success:true,
+            });
+          }
+        }).catch((error) => {
+          console.log(error)
+          message.destroy();
+          message.error("添加失败")
+        });
+    }
     render() {
+        if(this.state.success){
+            return <Redirect push to={Url.homepage} />;
+        }
         return (
             <Base chosen="4">
                 <div style={{ margin: "1rem 1rem" }}>
                     <div class="topbar">
                         <Title level={3} style={{ color: "black", textAlign: "center" }}>添加测试集</Title>
                     </div>
-                    <Form {...layout}>
+                    <Form {...layout} onFinish={this.handleSubmit}>
                         <Card title="基本信息" bordered={false} className="contentContainer">
                             <FormItem
                                 label="测试集名称"
@@ -204,15 +263,20 @@ class AddProblem extends React.Component {
                                 name="type"
                                 rules={[{ required: true, message: "Can't be empty!" }]}
                             >
-                                <Radio.Group defaultValue="1">
+                                <Radio.Group>
+                                    <Radio.Button value="0">图片测试集</Radio.Button>
                                     <Radio.Button value="1">视频测试集</Radio.Button>
-                                    <Radio.Button value="2">图片测试集</Radio.Button>
                                 </Radio.Group>
 
                             </FormItem>
                         </Card>
                         <Card title="测试素材" bordered={false} className="contentContainer">
-                            <PicturesWall />
+                            <FormItem
+                                valuePropName='fileList'
+                                rules={[{ required: true, message: "Can't be empty!" }]}
+                            >
+                                <PicturesWall fileList={this.state.fileList}/>
+                            </FormItem>
                         </Card>
                         <Card title="测试项目" bordered={false} className="contentContainer">
                             <FormItem
@@ -220,7 +284,7 @@ class AddProblem extends React.Component {
                                 rules={[{ required: true, message: "Can't be empty!" }]}
                                 wrapperCol={22}
                             >
-                                <ChallengeList />
+                                <ChallengeList data={this.state.data}/>
                             </FormItem>
                         </Card>
                         <Card title="测试限制" bordered={false} className="contentContainer">
@@ -228,27 +292,27 @@ class AddProblem extends React.Component {
                                 label="内存限制"
                                 name="memoryLimit"
                                 rules={[{ required: true, message: "Please input!" }]}
-                                
+
                             >
-                                <Input value="1000" addonAfter="MB"/>
+                                <Input value="1000" addonAfter="MB" />
 
                             </FormItem>
                             <FormItem
                                 label="运行时间限制"
                                 name="timeLimit"
                                 rules={[{ required: true, message: "Please input!" }]}
-                                
+
                             >
-                                <Input value="1000" addonAfter="ms"/>
+                                <Input value="1000" addonAfter="ms" />
 
                             </FormItem>
                             <FormItem
                                 label="错误率限制"
                                 name="bitErrorLimit"
                                 rules={[{ required: true, message: "Please input!" }]}
-                                
+
                             >
-                                <Input value="30" addonAfter="%"/>
+                                <Input value="30" addonAfter="%" />
 
                             </FormItem>
                             <FormItem
@@ -262,7 +326,7 @@ class AddProblem extends React.Component {
                         </Card>
                         <Card title="提交" bordered={false} className="contentContainer">
                             <FormItem {...tailLayout}>
-                                <Button type="primary" htmlType="submit" style={{width:'100%'}}>
+                                <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
                                     确认提交
                                 </Button>
                             </FormItem>

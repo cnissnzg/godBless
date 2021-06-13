@@ -14,5 +14,10 @@ public class ChallengeService {
   public List<Challenge> getProblemChallenge(int pid){
     return challengeMapper.getProblemChallenge(pid);
   }
-
+  public List<ChallengeParam> getChallenge(){
+    return challengeMapper.getChallenge();
+  }
+  public int add(ProblemChallenge problemChallenge){
+    return challengeMapper.add(problemChallenge);
+  }
 }

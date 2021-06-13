@@ -2,10 +2,10 @@
 api接口配置
  */
 //本地打包
-//const host = 'http://localhost:12306/api/v1/watermark';
+//const host = 'http://39.105.21.114:12306/api/v1/watermark';
 //浏览器
 const host = '/api/v1/watermark';
-const whole = 'http://localhost:12306/api/v1/watermark';
+const whole = 'http://39.105.21.114:12306/api/v1/watermark';
 const Api = {
   login: host + '/user/login',
 
@@ -30,6 +30,10 @@ const Api = {
     downloadtestdata: (pid,type,token) => host + '/api/v1/problem/download/testdata/?pid='+pid+'&type='+type+"&jwt="+token,
     checkDataExist: (pid) => host + '/api/v1/problem/checkDataExist/?pid='+pid,
     edit: host + '/api/v1/problem/edit/',
+
+    uploadMaterial: host +  '/problem/upload',
+    getParam: host + '/problem/getParam',
+    add: host + '/problem/add',
   },
 
   judge : {
@@ -38,10 +42,15 @@ const Api = {
     code: (id,cid=0) => host + '/api/v1/judge/code/?id='+id+'&cid='+cid,
     statistic: pid => host + '/api/v1/judge/statistic/?pid='+pid,
     submit: host + '/api/v1/judge/submit/',
-
     rejudge: host + '/api/v1/judge/rejudge/',
     reject: host + '/api/v1/judge/reject/',
-    downloadcode: (cid,token) => host + '/api/v1/judge/downloadcode/?cid='+cid+'&jwt='+token
+    downloadcode: (cid,token) => host + '/api/v1/judge/downloadcode/?cid='+cid+'&jwt='+token,
+
+    list: host + '/judge/list/',
+    report: runId => host + '/judge/report?runId='+runId,
+    start: (algorithmId,uid,pid) => host + '/judge/godBless?algorithmId='+algorithmId+'&uid='+uid+'&pid='+pid,
+    compile: runId => host + '/judge/compile?runId='+runId,
+    run: runId => host + '/judge/run?runId='+runId,
   },
 
   contest : {

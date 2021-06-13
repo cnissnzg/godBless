@@ -26,4 +26,13 @@ public class ProblemService {
     problem.setTags(tagMapper.getProblemTags(problem.getPid()));
     return problem;
   }
+  public int add(Problem problem){
+    return problemMapper.add(problem);
+  }
+  public int getPid(){
+    return problemMapper.getPid();
+  }
+  public int addLimit(Problem problem){
+    return problemMapper.addLimit(problem);
+  }
 }

@@ -6,9 +6,18 @@
         SELECT pid,title,acCnt,cCnt,materialCnt,testCnt,description FROM Watermark.Problem WHERE pid >= (SELECT pid FROM Watermark.Problem limit #{start},1) limit #{end};
     </select>
     <select id="getProblem" resultType="com.watermark.entity.Problem">
-        SELECT pid,title,description,timeLimit,memoryLimit,bitErrorLimit,qualityLimit FROM Watermark.Problem natural join ProblemLimits WHERE `pid` = #{pid};
+        SELECT pid,title,description,timeLimit,memoryLimit,bitErrorLimit,qualityLimit,`type` FROM Watermark.Problem natural join ProblemLimits WHERE `pid` = #{pid};
     </select>
     <select id="getTot" resultType="int">
         SELECT count(pid) as tot FROM Watermark.Problem;
     </select>
+    <select id="getPid" resultType="int">
+        SELECT max(pid) FROM Watermark.Problem;
+    </select>
+    <insert id="add" parameterType="com.watermark.entity.Problem">
+        INSERT INTO  Watermark.Problem (`uid`, `title`,`type`,`materialCnt`,`testCnt`,`description`,`pid`) VALUES (#{uname},#{title},#{type},#{materialCnt},#{testCnt},#{description},#{pid});
+    </insert>
+    <insert id="addLimit" parameterType="com.watermark.entity.Problem">
+        INSERT INTO  Watermark.ProblemLimits (`pid`,`timeLimit`,`memoryLimit`,`bitErrorLimit`,`qualityLimit`) VALUES (#{pid},#{timeLimit},#{memoryLimit},#{bitErrorLimit},#{qualityLimit});
+    </insert>
 </mapper>

@@ -1,7 +1,9 @@
 import React from 'react';
 import Base from '../superbase';
 import axios from 'axios';
-import { Typography, Form, Input, Select,Button} from 'antd';
+import { Api, Url } from '../../common/common';
+import { Redirect } from 'react-router-dom';
+import { Typography, Form, Input, Select,Button,message} from 'antd';
 import '../../css/base.css';
 
 const { Title } = Typography;
@@ -13,8 +15,43 @@ const layout = {
 const tailLayout = {
     wrapperCol: { span: 14, offset:14},
   };
+  const showUserName = () => {
+    let nowTime = new Date();
+    let deadtime = localStorage.getItem("tokendeadtime");
+    console.log(localStorage.hasOwnProperty("username"));
+    return deadtime != null && nowTime.getTime() < deadtime && localStorage.hasOwnProperty("hojxtoken") && localStorage.hasOwnProperty("username");
+  }
 class ProblemSubmit extends React.Component {
+    state = {
+        algorithms:{data:[]},
+        success:false,
+    }
+    componentDidMount(){
+        axios.get(Api.code.list(0,1000)).then((response)=>{
+            this.setState({
+                algorithms:response.data,
+            });
+        }).catch((error) => { console.log(error) })
+    }
+    handleSubmit = (values) => {
+        if(!showUserName()){
+            message.error("请先登录")
+            return;
+        }
+        let uid = localStorage.getItem("username");
+        axios.get(Api.judge.start(values.algorithmId,uid,values.pid)).then((response)=>{
+            message.success("已提交至测评队列")
+            this.setState({
+                success:true,
+            });
+        }).catch((error) => {
+            message.error("提交失败")
+             console.log(error) })
+    }
     render() {
+        if(this.state.success){
+            return <Redirect push to={Url.judge.status} />;
+        }
         return (
             <Base chosen="4">
                 <div class="topbar" style={{ marginLeft: "8rem",marginRight:"8rem",marginTop:"4rem" }}>
@@ -26,6 +63,7 @@ class ProblemSubmit extends React.Component {
                         name="basic"
                         initialValues={{ pid: this.props.match.params.pid }}
                         style={{width:"80%"}}
+                        onFinish={this.handleSubmit}
                         
                     >
                         <Form.Item
@@ -37,14 +75,10 @@ class ProblemSubmit extends React.Component {
 
                         <Form.Item
                             label="Algorithm"
-                            name="program"
+                            name="algorithmId"
                         >
                             <Select>
-                            <Option value="1">DCT</Option>
-              <Option value="2">DFT</Option>
-              <Option value="3">DWT</Option>
-              <Option value="4">DL</Option>
-              <Option value="5">DCT-DWT</Option>
+                                {this.state.algorithms.data.map(item=>(<Option value={item.algorithmId}>{item.name}</Option>))}
                             </Select>
                         </Form.Item>
 

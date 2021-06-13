@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { render } from 'react-dom';
-import { Layout, Menu, Typography, Button, Row, Col } from 'antd';
+import { Layout, Menu, Typography, Button, Row, Col,message } from 'antd';
 import imgUrl from "../img/logo2.jpg"
 import axios from 'axios';
 import 'antd/dist/antd.css';
@@ -46,10 +46,18 @@ class LoginToggle extends React.Component {
     } else {
       return (
         <div className="testTest">
+          <Row>
+            <Col>
           <Link to={Url.homepage}>
             <img className="avatar" src={require('../img/avatar/' + '0' + '.jpg').default} />
             <Text style={{ color: "white", fontSize: 14, verticalAlign: "middle" }}>{localStorage.getItem("username")}</Text>
           </Link>
+          </Col>
+          <Col style={{paddingLeft:"1rem"}}>
+            <Button danger shape="round" onClick={e=>{localStorage.clear();message.success("退出成功")}}
+            >注销</Button>
+          </Col>
+          </Row>
         </div>
       );
     }
@@ -67,7 +75,7 @@ class SuperBase extends React.Component {
             <Col span={3}>
               <img className="logo" src={imgUrl} />
             </Col>
-            <Col span={15}>
+            <Col span={13}>
               <Menu theme="dark" mode="horizontal" onClick={this.handleClick}>
                 <Menu.Item key="1"><Link to={Url.homepage}>主页</Link></Menu.Item>
                 <SubMenu title="代码" key="2" popupOffset={[-50, -5]}>
@@ -88,7 +96,8 @@ class SuperBase extends React.Component {
                     <Link to={Url.judge.status}>测试队列</Link>
                   </Menu.Item>
                 </SubMenu>
-                <Menu.Item key="6">脚本宏</Menu.Item>
+                <Menu.Item key="6" onClick={e=>{
+                message.info("请打开脚本宏编辑器程序")}}>脚本宏</Menu.Item>
                 <SubMenu title="评价平台" key="7" popupOffset={[-50, -5]}>
                   <Menu.Item>
                     <Link to={Url.watch.random}>开始评价</Link>
@@ -96,7 +105,7 @@ class SuperBase extends React.Component {
                 </SubMenu>
               </Menu>
             </Col>
-            <Col offset={1} span={4}>
+            <Col offset={1} span={6}>
               <LoginToggle />
             </Col>
           </Row>

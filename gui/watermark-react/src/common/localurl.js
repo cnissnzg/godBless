@@ -31,6 +31,7 @@ const Url = {
 
   judge:{
     status: prefix+'/judge/status',
+    report: runId => prefix+'/report/'+runId,
   },
 
   user:{

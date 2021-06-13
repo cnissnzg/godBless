@@ -7,5 +7,7 @@ import java.util.*;
 
 @Repository
 public interface MaterialMapper {
-  List<Material> getProblemMaterial(int pid);
+  public List<Material> getProblemMaterial(int pid);
+  public List<Material> getAllMaterial(int pid);
+  public int add(Material material);
 }

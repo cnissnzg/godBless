@@ -17,6 +17,7 @@ import CodeList from './component/code/codeList';
 import MyCodeList from './component/code/myCodeList';
 import JudgeQueue from './component/judge/judgeQueue';
 import RandomWatch from './component/watch/random';
+import JudgeDetail from './component/judge/report';
 
 ReactDOM.render((
   <Router>
@@ -25,6 +26,7 @@ ReactDOM.render((
       <Route exact path={Url.problem.list} component={ProblemList}/>
       <Route exact path={ Url.problem.detail(":pid") } component={ProblemDetail} />
       <Route path={Url.problem.submit(":pid") } component={ProblemSubmit} />
+      <Route path={Url.judge.report(":runId") } component={JudgeDetail} />
       <Route exact path={Url.user.register} component={Register} />
       <Route exact path={Url.login} component={Login} />
       <Route exact path={Url.code.editor(":algorithm")} component={CodeEitor} />

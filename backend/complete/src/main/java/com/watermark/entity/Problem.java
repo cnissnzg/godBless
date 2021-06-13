@@ -11,6 +11,8 @@ public class Problem {
   private String title;
   private int materialCnt;
   private int testCnt;
+  private int type;
+  private String uname;
 
   private String description;
   private List<String> Tags;
@@ -142,5 +144,21 @@ public class Problem {
 
   public void setQualityLimit(double qualityLimit) {
     this.qualityLimit = qualityLimit;
+  }
+
+  public int getType() {
+    return type;
+  }
+
+  public void setType(int type) {
+    this.type = type;
+  }
+
+  public String getUname() {
+    return uname;
+  }
+
+  public void setUname(String uname) {
+    this.uname = uname;
   }
 }

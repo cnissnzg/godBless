@@ -1,6 +1,6 @@
 import React from 'react';
 import Base from '../superbase'
-import { Card, Typography, Form,Rate,Row,Col,Button } from 'antd';
+import { Card, Typography, Form,Rate,Row,Col,Button,message } from 'antd';
 import '../../css/base.css';
 import Player from 'griffith'
 const { Title } = Typography;
@@ -76,10 +76,10 @@ class RandomWatch extends React.Component {
                         <Card title="提交" className="contentContainer">
                     <Row>
                         <Col span={3} offset={8}>
-                            <Button style={{ width: "100%" }}>下一条</Button>
+                            <Button style={{ width: "100%" }} onClick={e=>{message.warn("没有更多了")}}>下一条</Button>
                         </Col>
                         <Col span={3} offset={2}>
-                            <Button type="primary" style={{ width: "100%" }}>提交评价</Button>
+                            <Button type="primary" style={{ width: "100%" }} onClick={e=>{message.success("评价成功")}}>提交评价</Button>
                         </Col>
                     </Row>
 

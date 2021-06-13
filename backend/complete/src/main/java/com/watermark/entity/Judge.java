@@ -15,6 +15,7 @@ public class Judge implements Serializable{
   private String callerUid;
   private int state;
   private long timeStamp;
+  private boolean inJudge=false;
 
   public Judge() {
     this.state=0;
@@ -99,6 +100,14 @@ public class Judge implements Serializable{
 
   public void setCallerUid(String callerUid) {
     this.callerUid = callerUid;
+  }
+
+  public boolean isInJudge() {
+    return inJudge;
+  }
+
+  public void setInJudge(boolean inJudge) {
+    this.inJudge = inJudge;
   }
 
   public String tranIp(){

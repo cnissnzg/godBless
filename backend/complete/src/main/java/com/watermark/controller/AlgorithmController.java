@@ -73,6 +73,7 @@ public class AlgorithmController {
   public ResponseEntity<Integer> submit(@RequestBody Algorithm algorithm) throws Exception{
     String tokenHeader = request.getHeader("Authorization");
     String token = tokenHeader.replace(JwtTokenUtils.TOKEN_PREFIX, "");
+    String filename = algorithm.getName()+"@"+JwtTokenUtils.getUsername(token) +".tar.gz";
     String dirname = myConfig.getRoot()+"/"+algorithm.getName()+"@"+JwtTokenUtils.getUsername(token);
 
     FileUtils.deleteQuietly(new File(dirname));
@@ -90,6 +91,7 @@ public class AlgorithmController {
     if(algorithmService.check(JwtTokenUtils.getUsername(token),algorithm.getName()) == 0){
       algorithmService.addAlgorithm(algorithm);
     }
+    test(filename);
     return ResponseEntity.ok().build();
   }
 

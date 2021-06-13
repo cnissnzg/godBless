@@ -1,17 +1,34 @@
 import React from 'react';
 import Base from '../superbase';
-import { Table, Layout, Card, Tag } from 'antd';
+import { Table, message, Card, Tag } from 'antd';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Api, Url } from '../../common/common';
 import '../../css/base.css';
 import { DownOutlined, SortAscendingOutlined } from '@ant-design/icons';
 import Title from 'antd/lib/typography/Title';
+var compile = runId => {
+    axios.get(Api.judge.compile(runId)).then((response)=>{
+        message.success('已提交编译')
+    }).catch((error) => {
+         message.error('请重试')
+         console.log(error) })
+}
+var run = runId => {
+    axios.get(Api.judge.run(runId)).then((response)=>{
+        message.success('已提交运行')
+    }).catch((error) => {
+         message.error('请重试')
+         console.log(error) })
+}
 const columns = [
     {
         title: 'ID',
         dataIndex: 'runId',
         width: '10%',
+        render: (text, record, index) => {
+            return record.runId.split('-')[0]
+        }
     }, {
         title: '提交时间',
         dataIndex: 'ctime',
@@ -47,15 +64,16 @@ const columns = [
         render: (text, record, index) => {
             if(record.state=='2'){
                 return <span>
-                    <Link>编译</Link>
+                    <Link onClick={e=>{e.preventDefault();compile(record.runId)}}>编译</Link>
                 </span>;
             }else if(record.state=='5'){
                 return <span>
-                <Link>运行</Link>
+                <Link onClick={e=>{e.preventDefault();run(record.runId)}}>运行</Link>
             </span>;
             }else if(record.state=='11'){
+                const link = Url.judge.report(record.runId);
                 return <span>
-                <Link>查看报告</Link>
+                <Link to={link}>查看报告</Link>
             </span>;
             }else if(record.state=='3' || record.state=='6' || record.state=='12'){
                 return <span>
@@ -71,6 +89,7 @@ const columns = [
 ]
 class JudgeQueue extends React.Component {
     state = {
+        /*
         data: [
             { runId: '307f7da9', status: '请求已提交', state: '0', callerUid: '667', authorUid: '667', algorithmName: 'LSB_TEST', ctime: '5-31 23:21' ,title: '1000 - test'},
             { runId: '034ab5dc', status: '代码发送至虚拟环境', state: '1', callerUid: '667', authorUid: '667', algorithmName: 'LSB_TEST', ctime: '5-31 23:22' ,title: '1000 - test'},
@@ -86,6 +105,15 @@ class JudgeQueue extends React.Component {
             { runId: 'f32cd1cf', status: '测评结束', state: '11', callerUid: '667', authorUid: '667', algorithmName: 'LSB_TEST', ctime: '5-31 23:32' ,title: '1000 - test'},
             { runId: '086eaf13', status: '运行失败', state: '12', callerUid: '667', authorUid: '667', algorithmName: 'LSB_TEST', ctime: '5-31 23:33' ,title: '1000 - test'},
         ]
+        */
+       data: [],
+    }
+    componentDidMount(){
+        axios.get(Api.judge.list).then((response)=>{
+            this.setState({
+                data:response.data,
+            });
+        }).catch((error) => { console.log(error) })
     }
     render() {
         return (

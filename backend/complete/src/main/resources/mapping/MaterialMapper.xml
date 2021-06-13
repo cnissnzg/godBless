@@ -4,4 +4,11 @@
     <select id="getProblemMaterial" resultType="com.watermark.entity.Material">
         SELECT * FROM Watermark.Material WHERE `pid`=#{pid} LIMIT 8;
     </select>
+    <select id="getAllMaterial" resultType="com.watermark.entity.Material">
+        SELECT * FROM Watermark.Material WHERE `pid`=#{pid};
+    </select>
+    <insert id="add" parameterType="com.watermark.entity.Material">
+        INSERT INTO  Watermark.Material (`pid`, `filename`,`type`,`suffix`) VALUES (#{pid},#{filename},#{type},#{suffix});
+    </insert>
+
 </mapper>

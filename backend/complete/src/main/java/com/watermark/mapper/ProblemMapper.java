@@ -11,4 +11,7 @@ public interface ProblemMapper {
   public List<Problem> getProblemList(@Param("start")int start,@Param("end")int end);
   public Problem getProblem(@Param("pid") int pid);
   public int getTot();
+  public int add(Problem problem);
+  public int getPid();
+  public int addLimit(Problem problem);
 }

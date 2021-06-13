@@ -50,14 +50,19 @@ public class JudgeQueue {
       System.out.println("here we go!");
     }
   }
-  public synchronized static void putStatus(String runId,int status){
+  public synchronized static boolean putStatus(String runId,int status){
     if(status4Query.containsKey(runId)){
       if(status4Query.get(runId) >= status){
-        return;
+        return false;
       }
     }
     status4Query.put(runId,status);
+    return true;
   }
+  public synchronized static int getStatus(String runId){
+    return status4Query.get(runId);
+  }
+
   public synchronized static boolean check(String runId,String IP){
 
     if(hasReceived.containsKey(runId) && !hasReceived.get(runId).equals(IP)){
@@ -84,19 +89,40 @@ public class JudgeQueue {
     enovy.put(runId,judge);
     lock.unlock();
   }
+  public static List<Judge> getInfo(){
+    lock.lock();
+    HashMap<String,Judge> cpy = new HashMap<>();
+    cpy.putAll(enovy);
+    lock.unlock();
+    List<Judge> res = new ArrayList<>();
+    for(String key:cpy.keySet()){
+      Judge tmp = cpy.get(key);
+      tmp.setState(getStatus(key));
+      res.add(tmp);
+    }
+    return res;
+  }
   private static void loseControl(String runId){
     lock.lock();
     Judge judge = enovy.get(runId);
     judge.setState(-1);
     lock.unlock();
   }
-  public static void stillAlive(String id){
+  public static boolean stillAlive(String id){
     Judge judge = query(id);
+    if(judge==null){
+      return false;
+    }
+
     judge.setTimeStamp(System.currentTimeMillis());
     lock.lock();
+    if(!judge.isInJudge()){
+      judge.setInJudge(true);
+      heap.add(judge);
+    }
     enovy.put(id,judge);
-    heap.add(judge);
     lock.unlock();
+    return true;
   }
 
 
