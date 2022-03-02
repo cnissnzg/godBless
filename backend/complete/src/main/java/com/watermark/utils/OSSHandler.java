@@ -10,8 +10,8 @@ import java.io.*;
 
 public class OSSHandler {
   private static final String endpoint = "https://oss-cn-beijing.aliyuncs.com";
-  private static final String accessKeyId = "LTAI5tKfpvewxuAjFTzjZfh3";
-  private static final String accessKeySecret = "ZjgDRdhsPOMiYSXq4sYjJ6xvvpdwOV";
+  private static final String accessKeyId = "";
+  private static final String accessKeySecret = "";
   private static final String bucketName = "watermark-algorithm-code";
   private static OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
 
